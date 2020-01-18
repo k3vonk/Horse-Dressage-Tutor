@@ -1,2 +1,16 @@
 Webstorm /w Typescript: https://www.jetbrains.com/help/webstorm/typescript-support.html
 Refactoring TS: https://www.jetbrains.com/help/webstorm/specific-typescript-refactorings.html
+TypeScript Docs: https://www.typescriptlang.org/docs/home.html
+
+
+
+
+Learning:
+"Using the World Wide Web to Accomodate Diverse Learning Styles"
+https://www.tandfonline.com/doi/pdf/10.1080/87567559909595801?casa_token=WCzsT5L4kOMAAAAA:jVZWXXgGGcFy7ZyhwyRGONjaxxRnewKN0MKOPITRa4KCjyJoVcjrcM9XY5WeZz5SLrXHO-uZpNMBaQ
+
+Learning styles:
+visual, aural, verbal, physical, logical, social, solitary
+
+"A case study in online education and training"
+http://economice.ulbsibiu.ro/revista.economica/archive/70304cetina&goldbach&manea.pdf
