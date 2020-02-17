@@ -1,4 +1,7 @@
 // Stores constants associated to multiple classes
+// TODO: these should be capitals
+
+export const startPosition = [19, 0, 0];
 
 export const edgeLetters = {
     A: [15, 0 , 0],

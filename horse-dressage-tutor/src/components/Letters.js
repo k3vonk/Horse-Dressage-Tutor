@@ -6,7 +6,7 @@ import {centerlineLetters, edgeLetters} from "../Constants";
 function EdgeLetters() {
     return ( Object.entries(edgeLetters).map(([key, value]) =>
     {
-        let pos = value;
+        let pos = value.map((x) => x); // Makes a copy
         switch(key) {
             case "A":
                 pos[0] += 4;
@@ -33,9 +33,10 @@ function EdgeLetters() {
 }
 
 function CenterlineLetter() {
-    return ( Object.entries(centerlineLetters).map(([key, value]) =>
-        <Text position={value} children={key} height={0.1}/>
-    ))
+    return ( Object.entries(centerlineLetters).map(([key, value]) => {
+        let copiedValue = value.map((x) => x);
+        return <Text position={copiedValue} children={key} height={0.1}/>
+    }))
 }
 
 export default function Letters() {
