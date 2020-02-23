@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import Helper from "../components/stationary/Helper";
 import Ground from "../components/stationary/Ground";
+import Fences from "../components/stationary/Fences";
+import Letters from "../components/stationary/Letters";
+import Horse from "../components/Horse";
+import {horse} from "../components/Horse";
+import Lighting from "../components/stationary/Lighting";
 
 interface ScreenDimension {
     width: number,
@@ -10,6 +15,7 @@ interface ScreenDimension {
 export default class SceneManager  {
     private canvas: HTMLCanvasElement;
     private scene: THREE.Scene;
+    private horseScene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
     private screenDimension: ScreenDimension;
     private animationFrameId: number;
@@ -49,17 +55,13 @@ export default class SceneManager  {
         const camera = new THREE.PerspectiveCamera( fieldOfView, aspectRatio, nearPlane, farPlane);
 
         // Rotation at which we stare at (in degrees)
-        camera.rotation.x = 30*Math.PI/180;
-        camera.rotation.y = 0;
-        camera.rotation.z = 0;
+        camera.rotation.set(30*Math.PI/180, 0, 0);
 
         const initialCameraPositionY = -Math.tan(camera.rotation.x)*zDistance;
         const initialCameraPositionX = Math.tan(camera.rotation.y)*Math.sqrt(zDistance**2 + initialCameraPositionY**2);
 
         // Camera position
-        camera.position.y = initialCameraPositionY;
-        camera.position.x = initialCameraPositionX;
-        camera.position.z = zDistance;
+        camera.position.set(initialCameraPositionX, initialCameraPositionY, zDistance);
 
         return camera;
     }
@@ -70,17 +72,20 @@ export default class SceneManager  {
 
     createStationarySceneSubjects(scene: THREE.Scene) {
         new Helper({size: 40, divisions: 40}, scene);
+        new Lighting(scene);
         new Ground( {width: 40, height: 40, segments: 0}, scene);
-        const geometry: THREE.BoxGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const material: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true });
+        new Fences(scene);
+        new Letters(scene);
+        new Horse(scene);
 
-        const cube: THREE.Mesh = new THREE.Mesh(geometry, material);
-
-        this.scene.add(  cube );
     }
 
     animate(): void {
         this.render();
+
+        if(horse) {
+           // reference to the horse
+        }
         this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
     }
 
