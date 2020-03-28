@@ -9,7 +9,7 @@ export default class Letters {
 
     createEdgeLetters(scene: THREE.Scene) {
         for(let [key, value] of Object.entries(Constants.EDGE_LETTERS)) {
-            let pos = value;
+            let pos = value.map((x) => x); // Makes a copy
 
             switch(key) {
                 case "A":

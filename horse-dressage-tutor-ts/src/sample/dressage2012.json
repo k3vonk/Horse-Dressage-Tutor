@@ -1,0 +1,86 @@
+{
+  "name": "Novice Dressage Test 2012",
+  "tests": [
+    {
+      "sub_test_index": 1,
+      "sub_tests": [
+          {
+            "name": "A Enter at Working Trot",
+            "steps": [
+              {
+                "pos": ["START_POSITION", "X"],
+                "action": "Trot"
+              }
+            ]
+          },
+        {
+          "name": "X Halt, Immobility, Salute, Proceed at Working Trot",
+          "steps": [
+            {
+              "pos": ["X"],
+              "action":"Halt"
+            },
+            {
+              "pos": ["X"],
+              "action":"Immobility"
+            },
+            {
+              "pos": ["X"],
+              "action":"Salute"
+            },
+            {
+              "pos": ["X", "C"],
+              "action": "Trot-End-Turn"
+            }
+          ]
+        },
+        {
+          "name": " Track Left",
+          "steps": [
+            {
+              "pos": ["C", "H"],
+              "action": "LeftLeft"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sub_test_index": 2,
+      "sub_tests": [
+        {
+          "name": "HXF Change the Rein and show some Medium Trot Strides",
+          "steps": [
+            {
+              "pos": ["H", "X", "F"],
+              "action": "Trot"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sub_test_index": 3,
+      "sub_tests": [
+        {
+          "name": "FA Working Trot",
+          "steps": [
+            {
+              "pos": ["F", "A"],
+              "action": "Right-Trot"
+            }
+          ]
+        },
+        {
+          "name": "FA Working Trot",
+          "steps": [
+            {
+              "pos": ["A", "K"],
+              "action": "Right-Trot"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

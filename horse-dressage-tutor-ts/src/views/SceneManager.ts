@@ -4,8 +4,9 @@ import Ground from "../components/stationary/Ground";
 import Fences from "../components/stationary/Fences";
 import Letters from "../components/stationary/Letters";
 import Horse from "../components/Horse";
-import {horse} from "../components/Horse";
 import Lighting from "../components/stationary/Lighting";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import DressageTimeline from "../utils/DressageTimeline";
 
 interface ScreenDimension {
     width: number,
@@ -15,11 +16,14 @@ interface ScreenDimension {
 export default class SceneManager  {
     private canvas: HTMLCanvasElement;
     private scene: THREE.Scene;
-    private horseScene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
+    private orbitControls: OrbitControls;
     private screenDimension: ScreenDimension;
     private animationFrameId: number;
+    private horseScene: Horse;
     renderer: THREE.Renderer;
+
+    private hasTimeline = false;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -27,6 +31,7 @@ export default class SceneManager  {
         this.scene = this.buildScene();
         this.renderer = this.buildRender(canvas);
         this.camera = this.buildCamera(this.screenDimension);
+        this.orbitControls = this.buildOrbitControls(this.camera, this.renderer);
         this.scene.add(this.camera);
         this.animationFrameId = undefined;
 
@@ -66,6 +71,13 @@ export default class SceneManager  {
         return camera;
     }
 
+    buildOrbitControls(camera: THREE.Camera, render: THREE.Renderer): OrbitControls{
+        const orbitControls = new OrbitControls(camera, render.domElement);
+        // TODO: restrain angle movements
+        orbitControls.update();
+        return orbitControls;
+    }
+
     createSceneSubjects(scene: THREE.Scene) {
         // array of sceneSubjects adding new subjects here
     }
@@ -76,15 +88,15 @@ export default class SceneManager  {
         new Ground( {width: 40, height: 40, segments: 0}, scene);
         new Fences(scene);
         new Letters(scene);
-        new Horse(scene);
-
+        this.horseScene = new Horse(scene);
     }
 
     animate(): void {
         this.render();
 
-        if(horse) {
-           // reference to the horse
+        if(this.horseScene.getHorse() && !this.hasTimeline) {
+           let dressageTimeline = new DressageTimeline(this.horseScene.getHorse());
+           this.hasTimeline = true;
         }
         this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
     }

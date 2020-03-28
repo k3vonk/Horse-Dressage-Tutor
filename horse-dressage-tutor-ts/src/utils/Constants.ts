@@ -1,6 +1,6 @@
 
 export abstract class Constants {
-    static readonly START_POSITION = [19, 0, 0];
+    static readonly START = { START_POSITION: [19, 0, 0] };
     static readonly EDGE_LETTERS = {
         A: [15, 0 , 0],
         K: [11.2, -7, 0],
@@ -16,4 +16,6 @@ export abstract class Constants {
         X: [0, 0, 0],
         G: [-11.2, 0, 0]
     };
+
+    static readonly LETTERS = {...Constants.START, ...Constants.CENTER_LETTERS, ...Constants.EDGE_LETTERS};
 }
