@@ -1,21 +1,16 @@
 import * as THREE from 'three';
+import {defaultGridOptions} from "../../utils/Constants";
 
-interface Dimension {
-    size: number,
-    divisions: number
-}
+class Helper{
 
-export default class Helper {
-    private dimension: Dimension;
+    constructor(scene: THREE.Scene) {
+        const gridHelper = new THREE.GridHelper(defaultGridOptions.width, defaultGridOptions.height);
+        const axesHelper = new THREE.AxesHelper(defaultGridOptions.axes);
 
-    constructor(dimension: Dimension, scene: THREE.Scene) {
-        this.dimension = dimension;
-
-        const gridHelper = new THREE.GridHelper( this.dimension.size, this.dimension.divisions );
-        gridHelper.rotation.x = Math.PI/2; // Correct helper grid rotation
-        const axesHelper = new THREE.AxesHelper( 3 );
-        scene.add( gridHelper );
-        scene.add( axesHelper );
+        gridHelper.rotation.x = Math.PI/2; // Grid on XY Axis
+        scene.add(gridHelper);
+        scene.add(axesHelper);
     }
-
 }
+
+export default Helper;

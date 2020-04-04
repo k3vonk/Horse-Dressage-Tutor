@@ -1,76 +1,76 @@
 import * as THREE from 'three';
-import {Constants} from "../../utils/Constants";
+import {CENTER_LETTERS, defaultLetterStyles, EDGE_LETTERS} from "../../utils/Constants";
+import {Font, Vector3} from "three";
 
-export default class Letters {
-    constructor(scene: THREE.Scene) {
+class Letters {
+    private readonly font: Font;
+
+    constructor(scene: THREE.Scene, font: Font) {
+        this.font = font;
         this.createEdgeLetters(scene);
         this.createCenterLetters(scene);
     }
 
-    createEdgeLetters(scene: THREE.Scene) {
-        for(let [key, value] of Object.entries(Constants.EDGE_LETTERS)) {
-            let pos = value.map((x) => x); // Makes a copy
+    private createEdgeLetters(scene: THREE.Scene) {
+        for(let [key, value] of Object.entries(EDGE_LETTERS)) {
+            let position = new THREE.Vector3(value.x, value.y, value.z);
 
             switch(key) {
                 case "A":
-                    pos[0] += 4;
+                    position.x += defaultLetterStyles.xMargin;
                     break;
                 case "K":
                 case "E":
                 case "H":
-                    pos[1] -= 3;
+                    position.y -= defaultLetterStyles.yMargin;
                     break;
                 case "C":
-                    pos[0] -= 4;
+                    position.x -= defaultLetterStyles.xMargin;
                     break;
                 case "M":
                 case "B":
                 case "F":
-                    pos[1] += 3;
+                    position.y += defaultLetterStyles.yMargin;
                     break;
                 default:
                     break;
             }
 
-            this.createText(key, 1, 1, scene, pos);
+            this.createText(key, defaultLetterStyles.edgeLetterHeight, position, scene);
         }
     }
 
-    createCenterLetters(scene: THREE.Scene) {
-        for(let [key, value] of Object.entries(Constants.CENTER_LETTERS)) {
-            this.createText(key, 1, 0.1, scene, value);
+    private createCenterLetters(scene: THREE.Scene) {
+        for (let [key, value] of Object.entries(CENTER_LETTERS)) {
+            this.createText(key, defaultLetterStyles.centerLetterHeight, value, scene);
         }
     }
 
-    createText(letter: string, scaleSize: number, height: number, scene: THREE.Scene, pos: number[]) {
-        const loader = new THREE.FontLoader();
-
-        // Create font with text
-        loader.load('bold.blob', function(response) {
-
-            // Setup font geometry
-            const textGeo = new THREE.TextGeometry( letter, {
-                font: response,
-                size: 15,
-                height: 10,
-            });
-
-            const mesh = new THREE.Mesh(textGeo, new THREE.MeshNormalMaterial());
-
-            // center letters based on their current geometry
-            let size = new THREE.Vector3();
-            mesh.geometry.computeBoundingBox();
-            mesh.geometry.boundingBox.getSize(size);
-            mesh.position.x = -size.x /2;
-            mesh.position.y = -size.y/2;
-
-            // reposition based on set lines
-            const group = new THREE.Group();
-            group.add(mesh);
-            group.scale.set(0.1 * scaleSize, 0.1 * scaleSize, 0.1 * height);
-            group.position.set(pos[0], pos[1], pos[2]);
-
-            scene.add(group);
+    private createText(letter: string, height: number, position: Vector3, scene: THREE.Scene) {
+        // Setup font geometry
+        const textGeo = new THREE.TextGeometry( letter, {
+            font: this.font,
+            size: defaultLetterStyles.geometrySize,
+            height: defaultLetterStyles.geometryHeight,
         });
+
+        const mesh = new THREE.Mesh(textGeo, new THREE.MeshNormalMaterial());
+
+        // center letters based on their current geometry
+        let size = new THREE.Vector3();
+        mesh.geometry.computeBoundingBox();
+        mesh.geometry.boundingBox.getSize(size);
+        mesh.position.x = -size.x / 2;
+        mesh.position.y = -size.y / 2;
+
+        // reposition based on position
+        const group = new THREE.Group();
+        group.add(mesh);
+        group.scale.set(defaultLetterStyles.meshScale, defaultLetterStyles.meshScale, height );
+        group.position.set(position.x, position.y, position.z);
+
+        scene.add(group);
     }
 }
+
+export default Letters;

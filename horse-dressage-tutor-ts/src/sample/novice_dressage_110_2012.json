@@ -1,0 +1,573 @@
+{
+  "name": "BE Novice Dressage Test 110 (2012)",
+  "tests": [
+    {
+      "index": 1,
+      "subTests": [
+        {
+          "name": "A. Enter at Working Trot",
+          "steps": [
+            {
+              "position": [
+                "START",
+                "X"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "X. Halt, Immobility, Salute, Proceed at Working Trot",
+          "steps": [
+            {
+              "position": [
+                "X"
+              ],
+              "action": "Halt",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "X"
+              ],
+              "action": "Immobility",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "X"
+              ],
+              "action": "Salute",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "X",
+                "C"
+              ],
+              "action": "Straight-End",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "C. Track Left",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left-Midpoint",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "subTests": [
+        {
+          "name": "HXF. Change the Rein and show some Medium Trot Strides",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "X",
+                "F"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Trot",
+              "type": "Medium Strides"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "subTests": [
+        {
+          "name": "FA. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "A"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "2 Loop Serpentine ( Each loop touching the side of the Arena )",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "X"
+              ],
+              "action": "Serpentine-2-Down",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "subTests": [
+        {
+          "name": "X. Transition to Working Canter Left",
+          "steps": [
+            {
+              "position": [
+                "X",
+                "E"
+              ],
+              "action": "Straight-End",
+              "gait": "Canter-Left-Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "subTests": [
+        {
+          "name": "E. Track Left",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "K"
+              ],
+              "action": "Left",
+              "gait": "Canter-Left-Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "KAF. Working Canter left",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "A",
+                "F"
+              ],
+              "action": "Left",
+              "gait": "Canter-Left-Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "subTests": [
+        {
+          "name": "FBM. Show Some Medium Canter Strides",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "B",
+                "M"
+              ],
+              "action": "Straight",
+              "gait": "Canter-Left-Lead",
+              "type": "Medium Strides"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "subTests": [
+        {
+          "name": "MCH. Show Some Medium Canter Strides",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "C",
+                "H"
+              ],
+              "action": "Left",
+              "gait": "Canter-Left-Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "HXF. Change the Rein With a Transition to Working Trot at X",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "X",
+                "F"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "subTests": [
+        {
+          "name": "FAK. Medium Walk",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "A",
+                "K"
+              ],
+              "action": "Right",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "subTests": [
+        {
+          "name": "KXM. Change the Rein in Extended Walk",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "X",
+                "M"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Walk",
+              "type": "Extended"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "subTests": [
+        {
+          "name": "M. Medium Walk",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "C"
+              ],
+              "action": "Left",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        },
+        {
+          "name": "C. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "C"
+              ],
+              "action": "Halt",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "CX. 2 Loop Serpentine ( Each loop touching the side of the Arena)",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "X"
+              ],
+              "action": "Serpentine-2-Down",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "subTests": [
+        {
+          "name": "X. Transition to Working Canter Right",
+          "steps": [
+            {
+              "position": [
+                "X",
+                "E"
+              ],
+              "action": "Straight-End",
+              "gait": "Canter-Right-Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "subTests": [
+        {
+          "name": "E. Track Right",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "H"
+              ],
+              "action": "Right",
+              "gait": "Canter-Right-Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "EHCM. Working Canter Right",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "C",
+                "M"
+              ],
+              "action": "Right",
+              "gait": "Canter-Right-Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "subTests": [
+        {
+          "name": "MBF. Show Some Medium Canter Strides",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "B",
+                "F"
+              ],
+              "action": "Straight",
+              "gait": "Canter-Right-Lead",
+              "type": "Medium Strides"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "subTests": [
+        {
+          "name": "FA. Working Canter Right",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "A"
+              ],
+              "action": "Right",
+              "gait": "Canter-Right-Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "A. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "A"
+              ],
+              "action": "Halt",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "subTests": [
+        {
+          "name": "AK. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "K"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "KXM. Change the Rein and show some Medium Trot Strides",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "X",
+                "M"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Trot",
+              "type": "Medium Strides"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 16,
+      "subTests": [
+        {
+          "name": "MCHE. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "C",
+                "H"
+              ],
+              "action": "Left",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "H",
+                "E"
+              ],
+              "action": "Straight-End",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "E. Turn Left",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "G"
+              ],
+              "action": "Left-Midpoint",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "X. Turn Left",
+          "steps": [
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Halt",
+              "gait": "",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "G. Halt Immobility Salute",
+          "steps": [
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Immobility",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Salute",
+              "gait": "",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "Leave The Arena at Free Walk on a Long Rein at an Appropriate Place",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left-Midpoint",
+              "gait": "Walk",
+              "type": "Free"
+            },
+            {
+              "position": [
+                "H",
+                "E",
+                "K"
+              ],
+              "action": "Straight",
+              "gait": "Walk",
+              "type": "Free"
+            },
+            {
+              "position": [
+                "K",
+                "A",
+                "START"
+              ],
+              "action": "Exit",
+              "gait": "Walk",
+              "type": "Free"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

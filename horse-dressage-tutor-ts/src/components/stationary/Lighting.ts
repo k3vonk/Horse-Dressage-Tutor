@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export default class Lighting {
+class Lighting {
     constructor(scene: THREE.Scene) {
         const ambientLight = new THREE.AmbientLight();
         ambientLight.intensity = 0.25;
@@ -15,3 +15,5 @@ export default class Lighting {
         scene.add(spotLight);
     }
 }
+
+export default Lighting;

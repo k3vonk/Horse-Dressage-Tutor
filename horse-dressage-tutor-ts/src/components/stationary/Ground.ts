@@ -1,18 +1,14 @@
-import * as THREE from 'three';
+import * as THREE from "three";
+import {defaultColors, defaultGridOptions} from "../../utils/Constants";
 
-interface Dimensions {
-    width: number,
-    height: number,
-    segments: number
-}
+class Ground {
+    constructor(scene: THREE.Scene) {
+        const geometry = new THREE.PlaneGeometry(defaultGridOptions.width, defaultGridOptions.height, defaultGridOptions.segments);
+        const material = new THREE.MeshBasicMaterial({color: defaultColors.groundColor, side: THREE.DoubleSide});
+        const plane = new THREE.Mesh(geometry, material);
 
-export default class Ground  {
-
-    constructor(dimensions: Dimensions, scene: THREE.Scene) {
-        const geometry = new THREE.PlaneGeometry( dimensions.width, dimensions.height, dimensions.segments );
-        const material = new THREE.MeshBasicMaterial( {color: 0xc2b280 , side: THREE.DoubleSide} );
-        const plane = new THREE.Mesh( geometry, material );
-
-        scene.add( plane );
+        scene.add(plane);
     }
 }
+
+export default Ground;

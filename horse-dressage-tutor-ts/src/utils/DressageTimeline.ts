@@ -1,302 +1,378 @@
 import * as THREE from 'three';
+import {CubicBezierCurve3} from 'three';
 import {gsap} from 'gsap';
 import {MotionPathPlugin} from "gsap/MotionPathPlugin";
 import {CSSPlugin} from 'gsap/CSSPlugin';
-import {Constants} from "./Constants";
-import dressage2012 from '../sample/dressage2012.json';
+import {DressageTest, Point, Step, Steps, Test} from "./types";
+import {LETTERS, START} from "./Constants";
+import Vector from "./Vector";
 
 gsap.registerPlugin(MotionPathPlugin);
 gsap.registerPlugin(CSSPlugin);
 
-interface Step{
-    pos: string[],
-    action: string
-}
-
-interface Steps extends Array<Step> {}
-
-interface SubTest {
-    name: string,
-    steps: Steps
-}
-
-interface SubTests extends Array<SubTest> {}
-
-interface Point {
-    x: number,
-    y: number
-}
-
-export default class DressageTimeline {
+class DressageTimeline {
     private horse: THREE.Object3D;
-    private timeline: GSAPTimeline; // master timeline
+    private masterTimeline: GSAPTimeline;
+    private count: number;
+    private readonly lifecyclePoint: Point;
+    private latestPositionVector: THREE.Vector3;
 
     constructor(horse: THREE.Object3D) {
+        // setup
         this.horse = horse;
+        this.lifecyclePoint = {x: START.x, y: START.y};
+        this.latestPositionVector = new THREE.Vector3(START.x, START.y, START.z);
+        this.count = 0;
+        this.masterTimeline = gsap.timeline({repeat: 0});
 
-        this.timeline = gsap.timeline( {repeat: -1, onRepeat: function() {
-                this.horse.position.set(Constants.START.START_POSITION[0], Constants.START.START_POSITION[1], Constants.START.START_POSITION[2]);
+        const data: DressageTest = require("../sample/novice_dressage_110_2012.json");
+        this.buildTimeline(data);
+    }
+
+    /**
+     * Loop through the dressage test and create a suitable timeline
+     * @param data: is a DressageTest object
+     */
+    buildTimeline(data: DressageTest) {
+        for(let testIndex = 0; testIndex < data.tests.length; testIndex++) { // Iterate through tests...
+            const test: Test = data.tests[testIndex];
+            for(let subIndex = 0; subIndex < test.subTests.length; subIndex++) { // Iterate subTests in a single test
+
+                this.addLabelToMasterTimeline(subIndex, test);
+
+                const steps: Steps = test.subTests[subIndex].steps; // steps for this sub test
+                for(let stepIndex = 0; stepIndex < steps.length; stepIndex++) { // Iterate steps within a subTests...
+                    const step: Step = steps[stepIndex];
+
+                    switch(step.action) {
+                        case "Halt":
+                        case "Immobility":
+                        case "Salute": {
+                            this.masterTimeline.add(this.halt(step));
+                            break;
+                        }
+                        case "Straight": {
+                            this.masterTimeline.add(this.straight(step, false));
+                            break;
+                        }
+                        case "Straight-End": {
+                            this.masterTimeline.add(this.straight(step, true));
+                            break;
+                        }
+                        case "Left": {
+                            this.masterTimeline.add(this.turnLeft(false, step, []));
+                            break;
+                        }
+                        case "Left-Midpoint": {
+                            this.masterTimeline.add(this.turnLeft(true, step, []));
+                            break;
+                        }
+                        case "Right": {
+                            this.masterTimeline.add(this.turnRight(false, step, []));
+                            break;
+                        }
+                        case "Curvy-Straight": {
+                            this.masterTimeline.add(this.curveStraight(step));
+                            break;
+                        }
+                        case "Serpentine-2-Down": {
+                            this.masterTimeline.add(this.serpentine(step, 2, true));
+                            break;
+                        }
+                        case "Exit": {
+                            this.masterTimeline.add(this.SCurve(step));
+                            break;
+                        }
+                        default: {
+                            console.log("Action case does not exist!");
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    // ============= SUB TIMELINE TYPES =================================
+
+    //-----------------------------------------------------------------------------------             Halt
+    private halt(step: Step): GSAPTimeline {
+        const timeline = gsap.timeline();
+        const position = step.position;
+
+        let duration = 0.5;
+        if (step.gait !== "") {
+            duration = 0;
+        }
+        timeline.to(this.lifecyclePoint, {duration: duration, x: LETTERS[position[0]].x, y: LETTERS[position[0]].y, onUpdate: () => {
+                this.horse.position.x = this.lifecyclePoint.x;
+                this.horse.position.y = this.lifecyclePoint.y;
             }});
 
-        const firstTest: SubTests = dressage2012.tests[0].sub_tests; // Array of moves for test 0
-
-        let lastPosition = this.entrance(firstTest);
-
-
-        for (let i = 1; i < dressage2012.tests.length; i++) {
-            console.log(i);
-            const currTest: SubTests = dressage2012.tests[i].sub_tests;
-            lastPosition = this.createTimeline(currTest, lastPosition);
-        }
-
-        // A master timeline with sub timeline to hold other things
-        // TODO: take a json file and parse it?
+        return timeline;
     }
 
-    private entrance(subTests: SubTests): Point {
-        console.log(subTests);
-        let lastPosition: Point = {x: Constants.START.START_POSITION[0], y: Constants.START.START_POSITION[1] };
-        for (let i = 0; i < subTests.length; i++) { // iterate over substeps
-            // Some index here to label the first timeline
-            for (let step of subTests[i].steps) {
-                if (i === 0) { // first step
-                    if(step.action === "Trot")
-                        this.tweenTrot(step.pos, step.action);
+    //-----------------------------------------------------------------------------------             Straight
+    private straight(step: Step, oneStepBack: boolean): GSAPTimeline {
+        const timeline = gsap.timeline();
+        const position = step.position; // grab step attributes
+
+        let directionVector = new THREE.Vector3().subVectors(LETTERS[position[position.length - 1]], LETTERS[position[0]]).normalize(); // movement direction
+        let facingAngle  = Vector.lookAtFromLineCurve(this.latestPositionVector, LETTERS[position[position.length - 1]], directionVector.y >= 0);
+
+        for(let i = 0; i < position.length - 1; i++) {
+            let point = {x: LETTERS[position[i + 1]].x, y: LETTERS[position[i + 1]].y};
+            let endVector = new THREE.Vector3(LETTERS[position[position.length - 1]].x, LETTERS[position[position.length - 1]].y, 0);
+
+            if (oneStepBack && i === position.length - 2) { // move until 4 points away from destination
+                endVector.sub(directionVector.multiplyScalar(2));
+                point = endVector;
+            }
+
+            timeline.to(this.lifecyclePoint,{ease:"none", duration: 2,  x: point.x, y: point.y, onUpdate: ()=> {
+                    this.horse.position.x = this.lifecyclePoint.x;
+                    this.horse.position.y = this.lifecyclePoint.y;
+                    this.horse.rotation.z = facingAngle;
+                }});
+
+            this.latestPositionVector = endVector; // save last position
+
+        }
+        return timeline;
+    }
+
+    //-----------------------------------------------------------------------------------             TURN LEFT
+    private turnLeft(makeMidpoint: boolean, step?: Step, points?: Point[]): GSAPTimeline {
+        const timeline = gsap.timeline();
+
+        points.addStepsToPoint(step);
+        if(step && makeMidpoint) {
+            points.splice(1, 0, {x: points[0].x, y: (points[points.length - 1].y + points[0].y)/2}); // insert in center of array
+        }
+
+        for(let i = 0; i < points.length - 1; i++) { // number of turning operation
+            // local variables
+            let bezPoints = points.setupBezPoints(i, this.latestPositionVector);
+
+            let directionalVector = new THREE.Vector3().subVectors(new THREE.Vector3(points[i+1].x, points[i+1].y, 0), this.latestPositionVector).normalize();
+            // Adjust bezPoints based on direction
+            if (directionalVector.x < 0 && directionalVector.y < 0 && makeMidpoint) { // left down (special condition w/ step)
+                bezPoints[1] = {x: points[i].x, y: points[i].y};
+                bezPoints[2] = {x: points[i].x, y: points[i].y};
+            } else if ((directionalVector.x > 0 && directionalVector.y < 0) || (directionalVector.x < 0 && directionalVector.y > 0)) { // Moving - Right Down || Left Up
+                bezPoints[1] = {x: points[i].x, y: points[i + 1].y};
+                bezPoints[2] = {x: points[i].x, y: points[i + 1].y};
+            } else if ((directionalVector.x < 0 && directionalVector.y < 0) || (directionalVector.x > 0 && directionalVector.y > 0)) { // Moving - Left Down || Right Up
+                bezPoints[1] = {x: points[i+1].x, y: points[i].y};
+                bezPoints[2] = {x: points[i+1].x, y: points[i].y};
+            }
+
+            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0);
+        } // end of for loop...
+
+        return timeline;
+    }
+
+    //-----------------------------------------------------------------------------------             TURN RIGHT
+    private turnRight(makeMidpoint: boolean, step?: Step, points?: Point[]): GSAPTimeline {
+        const timeline = gsap.timeline();
+        points.addStepsToPoint(step);
+
+        for(let i = 0; i < points.length - 1; i++) { // number of turning operation
+            let bezPoints = points.setupBezPoints(i, this.latestPositionVector);
+
+            let directionalVector = new THREE.Vector3().subVectors(new THREE.Vector3(points[i+1].x, points[i+1].y, 0), this.latestPositionVector).normalize();
+            if((directionalVector.x > 0 && directionalVector.y < 0) || (directionalVector.x < 0 && directionalVector.y > 0)) { // Right Down || Left Up
+                bezPoints[1] = {x: points[i+1].x, y: points[i].y};
+                bezPoints[2] = {x: points[i+1].x, y: points[i].y};
+            } else if((directionalVector.x < 0 && directionalVector.y < 0) || (directionalVector.x > 0 && directionalVector.y > 0)) { // Left Down
+                bezPoints[1] = {x: points[i].x, y: points[i + 1].y};
+                bezPoints[2] = {x: points[i].x, y: points[i + 1].y};
+            }
+
+            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0);
+        }
+        return timeline;
+    }
+
+    private curveStraight(step: Step): GSAPTimeline{
+        const timeline = gsap.timeline();
+        const position = step.position;
+
+        let points = [];
+        points.addStepsToPoint(step);
+        for(let i = 0; i < position.length - 1; i++) {
+            // local variables
+            let bezPoints = points.setupBezPoints(i, this.latestPositionVector);
+
+            let directionalVector = new THREE.Vector3().subVectors(new THREE.Vector3(points[i+1].x, points[i+1].y, 0), this.latestPositionVector).normalize();
+
+            if (directionalVector.x > 0 && directionalVector.y > 0) { // Right Up
+                if (i === 0) { // Smooth curve into a straight line transition.
+                    bezPoints[1] = {x: points[i].x + 2, y: points[i].y};
+                    bezPoints[2] = {x: points[i].x + 2, y: points[i].y};
+                } else {
+                    bezPoints[1] = {x: points[i + 1].x - 2, y: points[i + 1].y};
+                    bezPoints[2] = {x: points[i + 1].x - 2, y: points[i + 1].y};
                 }
-                else if(step.action === "Halt" || step.action === "Immobility" || step.action === "Salute") {
-                    this.tweenHaltImmobilitySalute(step.pos, step.action);
-                }
-                else if(step.action === "Trot-End-Turn") {
-                    lastPosition = this.tweenTrotEndGap(step.pos, step.action);
-                }
-                else if(step.action === "LeftLeft") {
-                    lastPosition = this.tweenTurnLeftLeft(step.pos, step.action, lastPosition);
+            }  else if (directionalVector.x < 0 && directionalVector.y > 0) {
+                if(i === 0) {
+                    bezPoints[1] = {x: points[i].x - 2, y: points[i].y};
+                    bezPoints[2] = {x: points[i].x - 2, y: points[i].y};
+                } else {
+                    bezPoints[1] = {x: points[i + 1].x + 2, y: points[i + 1].y};
+                    bezPoints[2] = {x: points[i + 1].x + 2, y: points[i + 1].y};
                 }
             }
+
+            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0 );
         }
 
-        return lastPosition;
+        return timeline;
     }
 
-    private createTimeline(subTests: SubTests, startPosition: Point): Point {
-        let lastPoint: Point = startPosition;
-        for (let i = 0; i < subTests.length; i++) {
-            for (let subIndex = 0; subIndex < subTests[i].steps.length; subIndex++) {
-                let step = subTests[i].steps[subIndex];
-                console.log(step);
-                switch(step.action) {
-                    case "Trot": {
-                        this.tweenTrot(step.pos, step.action);
-                        break;
-                    }
-                    case "Right-Trot": // fallthrough
-                    case "Right": {
-                        lastPoint = this.tweenTurnRight(step.pos, step.action, lastPoint);
-                        break;
-                    }
-                    case "Serpentine": {
-                        break
-                    }
-                    default: {
-                        console.log("Case does not exist in createTimeline!");
-                        break;
-                    }
-                }
+    private serpentine(step: Step, loop: number, isDown: boolean): GSAPTimeline {
+        const timeline = gsap.timeline();
+        const position = step.position;
+
+        let midPoint = {
+            x: (LETTERS[position[0]].x + LETTERS[position[position.length - 1]].x)/2,
+            y: (LETTERS[position[0]].y + LETTERS[position[position.length - 1]].y)/2
+        };
+
+        for(let i = 0; i < loop; i++) {
+            let destination = { x: (LETTERS[position[i]].x + midPoint.x)/2, y: 7};
+
+            let points: Point[];
+            let directionalVector = new THREE.Vector3().subVectors(LETTERS[position[position.length - 1]], LETTERS[position[0]]).normalize();
+            if (isDown) { // Left Down
+                destination.y = -7;
+                points = [ {x: LETTERS[position[i]].x, y: LETTERS[position[i]].y}, destination, midPoint];
+
+                if (directionalVector.x < 0) {  timeline.add(this.turnRight(false, null, points)); } // turn left
+                else { timeline.add(this.turnLeft(false, null, points)); } // turn right
+
+            } else if (!isDown){ // Up Left
+                destination.y = 7;
+                points = [ midPoint, destination, {x: LETTERS[position[i]].x, y: LETTERS[position[i]].y}];
+
+                if (directionalVector.x < 0) {  timeline.add(this.turnLeft(false, null, points)); }
+                else {  timeline.add(this.turnRight(false, null, points)); }
+
             }
+
+            isDown = !isDown;
         }
 
-        return lastPoint;
+        return timeline;
     }
 
-    private tweenTrot(pos: string[], action: string) {
-        if (pos.length === 1) {
-            // 1 destination
+    private SCurve(step: Step): GSAPTimeline { // always receives 3 points
+        const timeline = gsap.timeline();
+        const position = step.position;
+
+        // setup points
+        let points = [];
+        points.addStepsToPoint(step);
+        points.splice(1, 0, {x: points[1].x, y: (points[points.length - 1].y + points[0].y)/2}); // insert in center of array
+
+        let removePoint = points[2];
+        points = points.filter(obj => obj !== removePoint);
+        console.log(points);
+        let directionalVector = new THREE.Vector3().subVectors(LETTERS[position[position.length - 1]], LETTERS[position[0]]).normalize();
+
+        if(directionalVector.x > 0) {
+            timeline.add(this.turnLeft(false, null, points.slice(0,2)));
+            timeline.add(this.turnRight(false, null, points.slice(1,points.length)));
         }
-        else if (pos.length === 2) {
-            this.timeline.fromTo(this.horse.position, {x: Constants.LETTERS[pos[0]][0], y: Constants.LETTERS[pos[0]][1]}, {ease: "none", duration: 2, x: Constants.LETTERS[pos[1]][0], y: Constants.LETTERS[pos[1]][1]});
-        }
-        else if(pos.length === 3) {
-            this.timeline.fromTo(this.horse.position, {x: Constants.LETTERS[pos[0]][0], y: Constants.LETTERS[pos[0]][1]}, {ease: "none", duration: 2, x: Constants.LETTERS[pos[1]][0], y: Constants.LETTERS[pos[1]][1]});
-            this.timeline.fromTo(this.horse.position, {x: Constants.LETTERS[pos[1]][0], y: Constants.LETTERS[pos[1]][1]}, {ease: "none", duration: 2, x: Constants.LETTERS[pos[2]][0], y: Constants.LETTERS[pos[2]][1]});
-        }
+
+        return timeline;
     }
 
-    private tweenTrotEndGap(pos: string[], action: string): Point {
-        let xGap = 0;
-        let yGap = 0;
+    private bezierCurvedTimeline(bezPoints: Point[], timeline: GSAPTimeline, isAboveCurve: boolean) {
+        let cubicBezierCurve = bezPoints.convertBezPointsToBezCurve();
 
-        if( Constants.LETTERS[pos[0]][0] !== Constants.LETTERS[pos[1]][0]) {
-            xGap = Constants.LETTERS[pos[0]][0] > Constants.LETTERS[pos[1]][0] ? 4: -4
-        }
-        if( Constants.LETTERS[pos[0]][1] !== Constants.LETTERS[pos[1]][1]) {
-            yGap = Constants.LETTERS[pos[0]][1] > Constants.LETTERS[pos[1]][1] ? 4: -4
+        let directionAngle = (90) * Math.PI/180;
+        if (isAboveCurve) {
+            directionAngle = -directionAngle;
         }
 
-        if (pos.length === 2) {
-            this.timeline.fromTo(this.horse.position, {x: Constants.LETTERS[pos[0]][0], y: Constants.LETTERS[pos[0]][1]}, {ease: "none", duration: 2, x: Constants.LETTERS[pos[1]][0] + xGap, y: Constants.LETTERS[pos[1]][1] + yGap})
-        }
-        return {x: Constants.LETTERS[pos[1]][0] + xGap,  y: Constants.LETTERS[pos[1]][1] + yGap};
+        let tick = 1/120; // 2 duration == 60 frames * 2
+        timeline.to(this.lifecyclePoint,{ease:"none", duration: 2, onUpdate: ()=> {
+                // move in a bezier curved path in the xy plane.
+                this.horse.position.x = this.lifecyclePoint.x;
+                this.horse.position.y = this.lifecyclePoint.y;
+
+                tick += 1/120; // look ahead
+                if (tick > 1) { tick = 1; } // Three curve from point A-B in 0-100%
+
+                // Rotation in the z-axis
+                let tangent = cubicBezierCurve.getTangent(tick).normalize();
+                let angle = -Math.atan(tangent.x / tangent.y);
+                this.horse.rotation.z = angle + directionAngle; // radians to correct angle at which the horse should be looking at
+            },
+            onComplete: ()=> {
+                tick = 0;
+            },
+            motionPath: {
+                path: bezPoints, type: "cubic"
+            }
+        });
+
+        // update latest end position
+        this.latestPositionVector.x = bezPoints[3].x;
+        this.latestPositionVector.y = bezPoints[3].y;
 
     }
 
-    private tweenTurnRight(pos: string[], action: string, lastPosition: Point): Point {
-        // Need to know if its first half or second half
-        let bezPoints: {}[];
-        // TODO: quadrant decision
-        if (Constants.LETTERS[pos[1]][1] >= 0) {
-            bezPoints = [{x: Constants.LETTERS[pos[0]][0], y: Constants.LETTERS[pos[0]][1]},
-                {x: Constants.LETTERS[pos[1]][0] + 1, y: Constants.LETTERS[pos[0]][1]}, // Anchor point
-                {x: Constants.LETTERS[pos[1]][0], y: Constants.LETTERS[pos[0]][1]}, // Anchor point
-                {x: Constants.LETTERS[pos[1]][0], y: Constants.LETTERS[pos[1]][1]}
-            ];
+    ///////////////////////////////  EXTRACTED METHODS TO REDUCE CODE
+    private addLabelToMasterTimeline(subIndex: number, test: Test) {
+        if (subIndex === 0) { // first sub test has an index
+            this.masterTimeline.addLabel(test.index + " "+ test.subTests[subIndex].name + "\t[" + this.count++ + "]"); // Add the phrase
         } else {
-            bezPoints = [{x: Constants.LETTERS[pos[0]][0], y: Constants.LETTERS[pos[0]][1]},
-                {x: Constants.LETTERS[pos[0]][0], y: Constants.LETTERS[pos[1]][1]}, // Anchor point
-                {x: Constants.LETTERS[pos[0]][0] + 1, y: Constants.LETTERS[pos[1]][1]}, // Anchor point
-                {x: Constants.LETTERS[pos[1]][0], y: Constants.LETTERS[pos[1]][1]}
-            ];
+            this.masterTimeline.addLabel("\t" + test.subTests[subIndex].name + "\t[" + this.count++ + "]"); // Add the phrase
         }
-
-        lastPosition = bezPoints[3] as Point; // new Point
-        console.log("Entered tweenTurnRight");
-        this.timeline.to(this.horse.position, {duration: 2, ease: "none" , motionPath: {
-                path: bezPoints,
-                type: "cubic"
-            }});
-
-        return lastPosition;
     }
-
-    private tweenTurnLeftLeft(pos: string[], action: string, lastPosition: Point): Point {
-
-        this.horse.position.set(lastPosition.x, lastPosition.y, 0);
-        // First Left
-        let bezPoints: {}[]= [{x: lastPosition.x, y: lastPosition.y},
-            {x: Constants.LETTERS[pos[0]][0] - 1, y: Constants.LETTERS[pos[0]][1]}, // Anchor point
-            {x: Constants.LETTERS[pos[0]][0], y: Constants.LETTERS[pos[0]][1]}, // Anchor point
-            {x: Constants.LETTERS[pos[0]][0], y:  Constants.LETTERS[pos[0]][1] + (Constants.LETTERS[pos[1]][1] - Constants.LETTERS[pos[0]][1])/2}
-        ];
-        let points = new THREE.CubicBezierCurve3(
-            new THREE.Vector3(lastPosition.x, lastPosition.y,  0),
-            new THREE.Vector3(Constants.LETTERS[pos[0]][0] - 1, Constants.LETTERS[pos[0]][1], 0),
-            new THREE.Vector3(Constants.LETTERS[pos[0]][0], Constants.LETTERS[pos[0]][1],0),
-            new THREE.Vector3(Constants.LETTERS[pos[0]][0], (Constants.LETTERS[pos[0]][1] + (Constants.LETTERS[pos[1]][1] - Constants.LETTERS[pos[0]][1])/2), 0)
-        );
-        var p = points.getPoints( 50 );
-        var geometry = new THREE.BufferGeometry().setFromPoints( p );
-        var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
-
-// Create the final object to add to the scene
-        var curveObject = new THREE.Line( geometry, material );
-        this.horse.add(curveObject);
-       lastPosition = bezPoints[3] as Point; // new Point
-
-
-        // TODO: testing
-/*
-        this.timeline.to(this.horse.position, {duration: 2, ease: "none",
-            motionPath: {
-                path: bezPoints,
-                type: "cubic"
-            }
-        }, "Hello");*/
-
-
-        var coords = {x: lastPosition.x, y: lastPosition.y};
-        var h = this.horse;
-        console.log(lastPosition);
-        console.log("hello");
-        //var horsePosition = new THREE.Vector3();
-        //var horseTarget = new THREE.Vector3();
-        var startPosition = 0;
-        this.timeline.to(coords, {duration: 2, ease: "none" , onUpdate: function() {
-
-                startPosition += 1/120;
-                var point = points.getPointAt(startPosition);
-                h.position.x = point.x;
-                h.position.y = point.y;
-                let tangent = points.getTangent(startPosition).normalize();
-
-                // change tangent to 3
-                var angle = -Math.atan(tangent.x / tangent.y);
-                // set the quaternion
-                console.log(angle);
-                h.rotation.z = angle + (90) * Math.PI/180;
-            },
-            motionPath: {
-                    path: bezPoints,
-                    type: "cubic",
-                }
-            }, "Hello");
-        /*
-
-                this.timeline.to(this.horse, {duration: 2, ease: "none", onUpdate: function() {
-                       // var newPosition = points.getPoint( startPosition );
-                       // horse.position.set(newPosition.x, newPosition.y, newPosition.z);
-                        startPosition += .001;
-        //Also update the car's orientation so it looks at the road
-                        var target = points.getPoint( startPosition );
-                        horse.lookAt( target );
-        //Also update the car's orientation so it looks at the road
-                    }
-                    }, "Hello"); */
-
-
-        // Second Left
-        bezPoints = [{x: lastPosition.x, y: lastPosition.y},
-            {x: Constants.LETTERS[pos[0]][0], y:  Constants.LETTERS[pos[1]][1]}, // Anchor point
-            {x: Constants.LETTERS[pos[0]][0] - 1, y: Constants.LETTERS[pos[1]][1]}, // Anchor point
-            {x: Constants.LETTERS[pos[1]][0], y:  Constants.LETTERS[pos[1]][1]}
-        ];
-
-        points = new THREE.CubicBezierCurve3(
-            new THREE.Vector3(lastPosition.x, lastPosition.y,  0),
-            new THREE.Vector3(Constants.LETTERS[pos[0]][0], Constants.LETTERS[pos[1]][1], 0),
-            new THREE.Vector3(Constants.LETTERS[pos[0]][0] - 1, Constants.LETTERS[pos[1]][1],0),
-            new THREE.Vector3(Constants.LETTERS[pos[1]][0], Constants.LETTERS[pos[1]][1], 0)
-        );
-
-        lastPosition = bezPoints[3] as Point; // new Point
-
-        var startPosition = 0;
-        this.timeline.to(coords, {duration: 2, ease: "none" , onUpdate: function() {
-
-                startPosition += 1/120;
-                var point = points.getPointAt(startPosition);
-                h.position.x = point.x;
-                h.position.y = point.y;
-                let tangent = points.getTangent(startPosition).normalize();
-
-                // change tangent to 3
-                var angle = -Math.atan(tangent.x / tangent.y);
-                // set the quaternion
-                console.log(angle);
-                h.rotation.z = angle + (90) * Math.PI/180;
-            },
-            motionPath: {
-                path: bezPoints,
-                type: "cubic",
-            }
-        }, "Hello2");
-
-        return lastPosition;
-    }
-
-    private tweenHaltImmobilitySalute(pos: string[], action: string) {
-        this.timeline.to(this.horse.position, {duration: 1, x: Constants.LETTERS[pos[0]][0]});
-        console.log(action);
-    }
-
-    private serpentineRight(pos: string[], action: string) {
-
-
-    }
-
-    getAngle( position: number, path: THREE.CubicBezierCurve3){
-        let tangent = path.getTangent(position).normalize();
-
-        // change tangent to 3D
-        return -Math.atan(tangent.x / tangent.y);
-    }
-
 }
+
+export default DressageTimeline;
+
+// Extensions to Array
+// eslint-disable-next-line no-extend-native
+Array.prototype.addStepsToPoint = function(step?: Step){
+    if (step) {
+        const position = step.position; // grab step attributes
+        for(let i = 0; i < position.length; i++) {
+            this.push({x: LETTERS[position[i]].x ,y: LETTERS[position[i]].y});
+        }
+    }
+};
+
+// eslint-disable-next-line no-extend-native
+Array.prototype.convertBezPointsToBezCurve = function(): CubicBezierCurve3{
+
+    return new THREE.CubicBezierCurve3(
+        new THREE.Vector3(this[0].x, this[0].y, 0),
+        new THREE.Vector3(this[1].x, this[1].y, 0),
+        new THREE.Vector3(this[2].x, this[2].y, 0),
+        new THREE.Vector3(this[3].x, this[3].y, 0)
+    );
+
+};
+
+// eslint-disable-next-line no-extend-native
+Array.prototype.setupBezPoints = function(i: number, vector: THREE.Vector3): Point[] {
+    return [
+        {x: vector.x, y: vector.y},
+        {x: 0, y: 0},
+        {x: 0, y: 0},
+        {x: this[i + 1].x, y: this[i + 1].y}
+    ];
+};
+
+
+
+
+
