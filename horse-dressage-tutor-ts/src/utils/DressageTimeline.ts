@@ -12,10 +12,10 @@ gsap.registerPlugin(CSSPlugin);
 
 class DressageTimeline {
     private horse: THREE.Object3D;
-    private masterTimeline: GSAPTimeline;
+    private readonly masterTimeline: GSAPTimeline;
     private count: number;
-    private readonly lifecyclePoint: Point;
     private latestPositionVector: THREE.Vector3;
+    private readonly lifecyclePoint: Point;
 
     constructor(horse: THREE.Object3D) {
         // setup
@@ -23,7 +23,7 @@ class DressageTimeline {
         this.lifecyclePoint = {x: START.x, y: START.y};
         this.latestPositionVector = new THREE.Vector3(START.x, START.y, START.z);
         this.count = 0;
-        this.masterTimeline = gsap.timeline({repeat: 0});
+        this.masterTimeline = gsap.timeline({paused: true});
 
         const data: DressageTest = require("../sample/novice_dressage_110_2012.json");
         this.buildTimeline(data);
@@ -104,7 +104,7 @@ class DressageTimeline {
 
         let duration = 0.5;
         if (step.gait !== "") {
-            duration = 0;
+            duration = 0.01;
         }
         timeline.to(this.lifecyclePoint, {duration: duration, x: LETTERS[position[0]].x, y: LETTERS[position[0]].y, onUpdate: () => {
                 this.horse.position.x = this.lifecyclePoint.x;
@@ -169,7 +169,7 @@ class DressageTimeline {
                 bezPoints[2] = {x: points[i+1].x, y: points[i].y};
             }
 
-            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0);
+            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0, timeline.totalDuration());
         } // end of for loop...
 
         return timeline;
@@ -192,7 +192,7 @@ class DressageTimeline {
                 bezPoints[2] = {x: points[i].x, y: points[i + 1].y};
             }
 
-            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0);
+            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0, timeline.totalDuration());
         }
         return timeline;
     }
@@ -227,7 +227,7 @@ class DressageTimeline {
                 }
             }
 
-            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0 );
+            this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0, timeline.totalDuration());
         }
 
         return timeline;
@@ -280,7 +280,6 @@ class DressageTimeline {
 
         let removePoint = points[2];
         points = points.filter(obj => obj !== removePoint);
-        console.log(points);
         let directionalVector = new THREE.Vector3().subVectors(LETTERS[position[position.length - 1]], LETTERS[position[0]]).normalize();
 
         if(directionalVector.x > 0) {
@@ -291,7 +290,7 @@ class DressageTimeline {
         return timeline;
     }
 
-    private bezierCurvedTimeline(bezPoints: Point[], timeline: GSAPTimeline, isAboveCurve: boolean) {
+    private bezierCurvedTimeline(bezPoints: Point[], timeline: GSAPTimeline, isAboveCurve: boolean, totalDuration: number) {
         let cubicBezierCurve = bezPoints.convertBezPointsToBezCurve();
 
         let directionAngle = (90) * Math.PI/180;
@@ -299,22 +298,18 @@ class DressageTimeline {
             directionAngle = -directionAngle;
         }
 
-        let tick = 1/120; // 2 duration == 60 frames * 2
         timeline.to(this.lifecyclePoint,{ease:"none", duration: 2, onUpdate: ()=> {
                 // move in a bezier curved path in the xy plane.
                 this.horse.position.x = this.lifecyclePoint.x;
                 this.horse.position.y = this.lifecyclePoint.y;
 
-                tick += 1/120; // look ahead
+                let tick = ((timeline.time() * 60) - (totalDuration*60))/120; // look ahead
                 if (tick > 1) { tick = 1; } // Three curve from point A-B in 0-100%
 
                 // Rotation in the z-axis
                 let tangent = cubicBezierCurve.getTangent(tick).normalize();
                 let angle = -Math.atan(tangent.x / tangent.y);
                 this.horse.rotation.z = angle + directionAngle; // radians to correct angle at which the horse should be looking at
-            },
-            onComplete: ()=> {
-                tick = 0;
             },
             motionPath: {
                 path: bezPoints, type: "cubic"
@@ -332,8 +327,12 @@ class DressageTimeline {
         if (subIndex === 0) { // first sub test has an index
             this.masterTimeline.addLabel(test.index + " "+ test.subTests[subIndex].name + "\t[" + this.count++ + "]"); // Add the phrase
         } else {
-            this.masterTimeline.addLabel("\t" + test.subTests[subIndex].name + "\t[" + this.count++ + "]"); // Add the phrase
+            this.masterTimeline.addLabel( test.subTests[subIndex].name + "\t[" + this.count++ + "]"); // Add the phrase
         }
+    }
+
+    public getTimeline(): GSAPTimeline {
+        return this.masterTimeline
     }
 }
 

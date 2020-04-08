@@ -3,13 +3,13 @@ import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import Helper from "./components/stationary/Helper";
 import Ground from "./components/stationary/Ground";
 import {defaultCameraOptions} from "./utils/Constants";
-import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
 import {Font} from "three";
 import Letters from "./components/stationary/Letters";
 import Fences from "./components/stationary/Fences";
 import Lighting from "./components/stationary/Lighting";
 import Horse from "./components/Horse";
 import DressageTimeline from "./utils/DressageTimeline";
+import LoadManager from "./utils/LoadManager";
 
 class SceneManager {
     private readonly canvas: HTMLCanvasElement;
@@ -17,9 +17,10 @@ class SceneManager {
     private readonly camera: THREE.PerspectiveCamera;
     private readonly horse: Horse;
     private animationFrameID?: number;
+    private dressageTimeline: GSAPTimeline;
     renderer: THREE.Renderer;
 
-    constructor(canvas: HTMLCanvasElement, horseGTLF: GLTF, font: Font) {
+    constructor(canvas: HTMLCanvasElement, loadingManager: LoadManager) {
         this.canvas = canvas;
         this.scene = this.buildScene();
         this.renderer = this.buildRender();
@@ -28,10 +29,13 @@ class SceneManager {
         this.animationFrameID = undefined;
 
         // Add Subjects to Scene
-        this.horse = new Horse(this.scene, horseGTLF);
+        this.horse = new Horse(this.scene, loadingManager.horseGLTF);
         this.scene.add(this.camera);
-        this.createStaticSceneSubjects(font);
-        new DressageTimeline(this.horse.getHorse());
+        this.createStaticSceneSubjects(loadingManager.font);
+
+        // setup timeline
+        const animation = new DressageTimeline(this.horse.getHorse());
+        this.dressageTimeline = animation.getTimeline();
     }
 
     buildScene(): THREE.Scene {
@@ -85,6 +89,10 @@ class SceneManager {
         this.renderer.render(this.scene, this.camera);
         this.animationFrameID = requestAnimationFrame(this.render.bind(this)); // call back to get ID
         //console.log(this.animationFrameID);
+    }
+
+    getTimeline(): GSAPTimeline {
+        return this.dressageTimeline;
     }
 
     onWindowResize(): void {

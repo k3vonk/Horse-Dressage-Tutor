@@ -110,7 +110,7 @@
           ]
         },
         {
-          "name": "2 Loop Serpentine ( Each loop touching the side of the Arena )",
+          "name": "Two Loop Serpentine ( Each loop touching the side of the Arena )",
           "steps": [
             {
               "position": [
@@ -304,7 +304,7 @@
           ]
         },
         {
-          "name": "CX. 2 Loop Serpentine ( Each loop touching the side of the Arena)",
+          "name": "CX. Two Loop Serpentine ( Each loop touching the side of the Arena)",
           "steps": [
             {
               "position": [

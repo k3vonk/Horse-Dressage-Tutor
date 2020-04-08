@@ -1,0 +1,23 @@
+.slider {
+    #position: absolute;
+    #top: 90%;
+    #left: 55%;
+    #width: 30%;
+    #padding-right: 100px;
+    #transform: translate(-50%);
+}
+
+.mark {
+    backgroundColor: '#bfbfbf';
+    height: 8;
+    width: 1;
+    marginTop: -3;
+}
+
+.time {
+    #position: absolute;
+    #text-align: center;
+    #top: -15px;
+}
+
+
