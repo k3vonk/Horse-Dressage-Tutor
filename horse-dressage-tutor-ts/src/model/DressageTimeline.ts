@@ -3,8 +3,8 @@ import {CubicBezierCurve3} from 'three';
 import {gsap} from 'gsap';
 import {MotionPathPlugin} from "gsap/MotionPathPlugin";
 import {CSSPlugin} from 'gsap/CSSPlugin';
-import {DressageTest, Point, Step, Steps, Test} from "./types";
-import {LETTERS, START} from "./Constants";
+import {DressageTest, Point, Step, Steps, Test} from "../utils/types";
+import {LETTERS, START} from "../utils/Constants";
 import Vector from "./Vector";
 
 gsap.registerPlugin(MotionPathPlugin);
@@ -17,7 +17,7 @@ class DressageTimeline {
     private latestPositionVector: THREE.Vector3;
     private readonly lifecyclePoint: Point;
 
-    constructor(horse: THREE.Object3D) {
+    constructor(horse: THREE.Object3D, data: DressageTest) {
         // setup
         this.horse = horse;
         this.lifecyclePoint = {x: START.x, y: START.y};
@@ -25,7 +25,6 @@ class DressageTimeline {
         this.count = 0;
         this.masterTimeline = gsap.timeline({paused: true});
 
-        const data: DressageTest = require("../sample/novice_dressage_110_2012.json");
         this.buildTimeline(data);
     }
 

@@ -1,26 +1,20 @@
 import * as THREE from 'three';
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
-import Helper from "./components/stationary/Helper";
-import Ground from "./components/stationary/Ground";
+import Helper from "./components/scene/Helper";
+import Ground from "./components/scene/Ground";
 import {defaultCameraOptions} from "./utils/Constants";
-import {Font} from "three";
-import Letters from "./components/stationary/Letters";
-import Fences from "./components/stationary/Fences";
-import Lighting from "./components/stationary/Lighting";
-import Horse from "./components/Horse";
-import DressageTimeline from "./utils/DressageTimeline";
-import LoadManager from "./utils/LoadManager";
+import Fences from "./components/scene/Fences";
+import Lighting from "./components/scene/Lighting";
+
 
 class SceneManager {
     private readonly canvas: HTMLCanvasElement;
-    private readonly scene: THREE.Scene;
     private readonly camera: THREE.PerspectiveCamera;
-    private readonly horse: Horse;
     private animationFrameID?: number;
-    private dressageTimeline: GSAPTimeline;
+    scene: THREE.Scene;
     renderer: THREE.Renderer;
 
-    constructor(canvas: HTMLCanvasElement, loadingManager: LoadManager) {
+    constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.scene = this.buildScene();
         this.renderer = this.buildRender();
@@ -29,16 +23,15 @@ class SceneManager {
         this.animationFrameID = undefined;
 
         // Add Subjects to Scene
-        this.horse = new Horse(this.scene, loadingManager.horseGLTF);
         this.scene.add(this.camera);
-        this.createStaticSceneSubjects(loadingManager.font);
+        this.createStaticSceneSubjects();
 
         // setup timeline
-        const animation = new DressageTimeline(this.horse.getHorse());
-        this.dressageTimeline = animation.getTimeline();
+        //const animation = new DressageTimeline(this.horse.getHorse());
+        //this.dressageTimeline = animation.getTimeline();
     }
 
-    buildScene(): THREE.Scene {
+    private buildScene(): THREE.Scene {
         const scene = new THREE.Scene();
         scene.background = new THREE.Color("#FFF");
         return scene;
@@ -76,11 +69,10 @@ class SceneManager {
         orbitControls.update();
     }
 
-    private createStaticSceneSubjects(font: Font) {
+    private createStaticSceneSubjects() {
         new Helper(this.scene);
         new Ground(this.scene);
         new Lighting(this.scene);
-        new Letters(this.scene, font);
         new Fences(this.scene);
     }
 
@@ -88,11 +80,6 @@ class SceneManager {
         // Update subjects if necessary
         this.renderer.render(this.scene, this.camera);
         this.animationFrameID = requestAnimationFrame(this.render.bind(this)); // call back to get ID
-        //console.log(this.animationFrameID);
-    }
-
-    getTimeline(): GSAPTimeline {
-        return this.dressageTimeline;
     }
 
     onWindowResize(): void {

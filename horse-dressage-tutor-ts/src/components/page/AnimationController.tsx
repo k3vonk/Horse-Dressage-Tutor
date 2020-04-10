@@ -1,31 +1,33 @@
 import React, {useEffect, useState} from 'react';
 import {Mark} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
-import Slider from "@material-ui/core/Slider";
 import IconButton from "@material-ui/core/IconButton";
 import ReplayIcon from "@material-ui/icons/Replay";
 import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
+import CustomSlider from "./CustomSlider";
+import AnimationControllerStyles from "../../css/AnimationControllerStyle";
+import {DressageStepMessage} from "./DressageStepMessage";
 
 interface AnimationProps {
     timeline: GSAPTimeline
+    title: string
 }
 
-
-export const Animation: React.FC<AnimationProps> = (props) => {
+export const AnimationController: React.FC<AnimationProps> = (props) => {
     const [isDraggablePaused, setIsDraggablePaused] = useState<boolean>(false);
     const [isReplay, setIsReplay] = useState<boolean>(false);
     const [sliderValue, setSliderValue] = useState<number>(0);
-    const [marks, setMarks] = useState<Mark[]>([]);
+    const [marks, setMarks] = useState<Mark[]>([]); // setup marks for the slider
+    const classes = AnimationControllerStyles();
 
     // init
     useEffect(() => {
         // timeline callback to onUpdate
         props.timeline.eventCallback("onUpdate", () =>{
             setSliderValue(props.timeline.progress() * props.timeline.totalDuration());
-
             if (props.timeline.progress() === 1) {
                 setIsReplay(true);
             } else {
@@ -33,14 +35,11 @@ export const Animation: React.FC<AnimationProps> = (props) => {
             }
         });
 
-        // setup
-        props.timeline.play(); // play timeline...
-        setIsDraggablePaused(false);
-    }, [props.timeline]);
+        if (marks.length === 0) { // eslint gives warning if I try to put this in a separate function
+            // setup
+            props.timeline.play(); // play timeline...
+            setIsDraggablePaused(false);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let generateMarks = function() {
-        if (marks.length === 0) {
             let marks: Mark[] = [];
             for (let [key, value] of Object.entries(props.timeline.labels)) {
                 let label = "";
@@ -50,18 +49,18 @@ export const Animation: React.FC<AnimationProps> = (props) => {
                 // Add a mark
                 marks.push({
                     value: value,
-                    label: label
+                    label: label,
                 })
             }
             setMarks(marks);
         }
-    }(); // Called function
+    },[marks.length, props.timeline]);
 
     const timeConvert = function(time: number): String {
         const date = new Date(time * 1000);
         const minutes = date.getUTCMinutes();
         const seconds = date.getSeconds();
-        return minutes.toString().padStart(1, '0') + ":" + seconds.toString().padStart(2, '0');
+        return minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
     };
 
     // ==================   Display functions   ==================
@@ -94,14 +93,14 @@ export const Animation: React.FC<AnimationProps> = (props) => {
                 setIsDraggablePaused(true);
             }
         } else {
-            props.timeline.progress(0);
+            props.timeline.progress(0); // restart
         }
     };
 
     const onSkipNextClick = function() {
         let nextLabel = props.timeline.nextLabel();
         // @ts-ignore
-        props.timeline.seek(nextLabel,false);
+        props.timeline.seek(nextLabel,false); // Gsap typescript definition and Gsap documents are currently different. But overload functionality is possible
     };
 
     const onSkipPrevClick = function() {
@@ -112,44 +111,49 @@ export const Animation: React.FC<AnimationProps> = (props) => {
         }
     };
 
-
     return (
-        <div>
-            <Grid container spacing={1}>
-                <Grid item>
-                    <IconButton aria-label="play-pause-replay" onClick={onPlayButtonClick}>
-                        {isReplay?
-                            <ReplayIcon/>
-                            : visualIconOnActive()
-                        }
-                    </IconButton>
+        <>
+            <div className={classes.root}>
+                <Grid
+                    container
+                    direction="row"
+                    justify="center"
+                    alignItems="center"
+                >
+                    <Grid item md={3} xs={12}>
+                        <h2 className={classes.h2}>{props.title}</h2>
+                    </Grid>
+                    <Grid item xs={"auto"}>
+                        <IconButton className={classes.iconButton} aria-label="play-pause-replay" onClick={onPlayButtonClick}>
+                            {isReplay? <ReplayIcon /> :visualIconOnActive()}
+                        </IconButton>
+                        <IconButton  className={classes.iconButton} aria-label="skipNext" onClick={onSkipPrevClick}>
+                            <SkipPreviousIcon />
+                        </IconButton>
+                        <IconButton className={classes.iconButton} aria-label="skipNext" onClick={onSkipNextClick}>
+                            <SkipNextIcon />
+                        </IconButton>
+                    </Grid>
+                    <Grid item lg={"auto"} sm={1} xs={2}>
+                        <h6 className={classes.h6}>{timeConvert(props.timeline.time())}</h6>
+                    </Grid>
+                    <Grid item lg={6} md={5} sm={6} xs={4}>
+
+                        <CustomSlider
+                            min={0.0}
+                            max={props.timeline.totalDuration()}
+                            value={sliderValue}
+                            marks={marks}
+                            onChange={onSliderChange}
+                            onChangeCommitted={onSliderCommitted}
+                            aria-label="continuous-slider"
+                        />
+                    </Grid>
+                    <Grid item lg={"auto"} sm={1} xs={2}>
+                        <h6 className={classes.h6}>{timeConvert(props.timeline.totalDuration())}</h6>
+                    </Grid>
                 </Grid>
-                <Grid item>
-                    <IconButton aria-label="skipNext" onClick={onSkipPrevClick}>
-                        <SkipPreviousIcon/>
-                    </IconButton>
-                </Grid>
-                <Grid item>
-                    <IconButton aria-label="skipNext" onClick={onSkipNextClick}>
-                        <SkipNextIcon/>
-                    </IconButton>
-                </Grid>
-                <Grid item xs aria-labelledby="continuous-slider">
-                    <div>
-                        <Slider className="marker"
-                                min={0.0}
-                                max={props.timeline.totalDuration()}
-                                value={sliderValue}
-                                marks={marks}
-                                onChange={onSliderChange}
-                                onChangeCommitted={onSliderCommitted}
-                                valueLabelDisplay="auto"
-                        /> </div>
-                </Grid>
-                <Grid item>
-                    <p className="time">{timeConvert(props.timeline.time()) + " / " + timeConvert(props.timeline.totalDuration())}</p>
-                </Grid>
-            </Grid>
-        </div>
+            </div>
+        </>
     )
 };
