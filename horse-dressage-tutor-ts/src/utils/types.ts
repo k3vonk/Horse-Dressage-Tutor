@@ -1,14 +1,12 @@
 import * as THREE from 'three';
+import HorseManager from "../components/HorseManager";
 
 export interface GridOptions {
-    width: number,
+    size: number,
+    divisions: number,
     height: number,
-    axes: number,
-    segments: number
-}
-
-export interface SceneSubject {
-    update: (number) => void;
+    zAxis: number,
+    axes: number
 }
 
 export interface ColorOptions {
@@ -22,9 +20,6 @@ export interface CameraOptions {
     zDistance: number
 }
 
-export interface Start {
-    startPosition: THREE.Vector3
-}
 export interface EdgeLetters {
     A: THREE.Vector3,
     K: THREE.Vector3,
@@ -105,4 +100,13 @@ export interface Point {
 }
 
 
+export interface NavBarProps {
+    timeline: GSAPTimeline,
+    progress: number,
+    horseManager: HorseManager,
+}
 
+export interface Label {
+    text: string,
+    progress: number,
+}

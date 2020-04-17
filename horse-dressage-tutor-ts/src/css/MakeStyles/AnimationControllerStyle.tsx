@@ -1,3 +1,9 @@
+/**
+ * Creates the CSS styles for the AnimationController page
+ *
+ * @author: Ga Jun Young
+ */
+
 import {makeStyles} from "@material-ui/core/styles";
 import {createStyles, Theme} from "@material-ui/core";
 
@@ -50,6 +56,5 @@ const AnimationControllerStyles = makeStyles((theme: Theme) =>
         }
     }),
 );
-
 
 export default AnimationControllerStyles;

@@ -10,3 +10,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
   monospace;
 }
+
+.threeContainer {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+}
+
+.section{
+  position: relative;
+  background: rgba(0, 0, 0, 0.5);
+  margin-top: 90vh;
+  height: 100vh;
+}

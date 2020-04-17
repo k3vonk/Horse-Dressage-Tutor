@@ -5,16 +5,17 @@ import {
     EdgeLetters,
     FenceOptions,
     GridOptions,
-    LetterStyle
+    LetterStyle, Step
 } from "./types";
 import * as THREE from 'three';
 import {Vector3} from "three";
 
 export const defaultGridOptions: GridOptions = {
-    width: 40,
+    size: 40,
+    divisions: 40,
     height: 40,
+    zAxis: -20,
     axes: 3,
-    segments: 0
 };
 
 export const defaultColors: ColorOptions = {
@@ -25,7 +26,7 @@ export const defaultCameraOptions: CameraOptions = {
     nearPlane: 0.1,
     farPlane: 1000,
     fieldOfView: 75,
-    zDistance: 15
+    zDistance: 20
 };
 
 export const defaultLetterStyles: LetterStyle = {
@@ -62,10 +63,8 @@ export const defaultFenceOptions: FenceOptions = {
     }
 };
 
-export const UP = new Vector3(0, 1, 0);
-export const DOWN = new Vector3(0, -1, 0);
-export const LEFT = new Vector3(-1, 0, 0);
-export const RIGHT = new Vector3(1, 0, 0);
+export const MAX_Y_AXIS: number = 7;
+export const MIN_Y_AXIS: number = -7;
 
 export const START = new Vector3(17, 0, 0);
 export const EDGE_LETTERS: EdgeLetters = {
@@ -86,3 +85,36 @@ export const CENTER_LETTERS: CenterLetters = {
 };
 
 export const LETTERS = {START, ...CENTER_LETTERS, ...EDGE_LETTERS};
+
+export const FINAL_STEP: Step = {
+    position:["START"],
+    action: "Halt",
+    gait: "",
+    type: ""
+};
+
+export const ANIMATION = {
+    "": 0,
+    "Walk": 1,
+    "Trot": 2,
+    "Canter Right Lead": 3,
+    "Canter Left Lead": 4
+};
+
+export const DURATIONS = {
+    "change": 0.01,
+    "": 0.5,
+    "Walk": 4,
+    "Trot": 5,
+    "Canter Right Lead": 6,
+    "Canter Left Lead": 6
+};
+
+export const TYPE = {
+    "Free": 1.2,
+    "Working": 1.2,
+    "": 1,
+    "Medium": 1,
+    "Medium Strides": 0.8,
+    "Extended": 0.8
+};

@@ -137,7 +137,7 @@
                 "E"
               ],
               "action": "Straight-End",
-              "gait": "Canter-Left-Lead",
+              "gait": "Canter Left Lead",
               "type": "Working"
             }
           ]
@@ -156,7 +156,7 @@
                 "K"
               ],
               "action": "Left",
-              "gait": "Canter-Left-Lead",
+              "gait": "Canter Left Lead",
               "type": "Working"
             }
           ]
@@ -171,7 +171,7 @@
                 "F"
               ],
               "action": "Left",
-              "gait": "Canter-Left-Lead",
+              "gait": "Canter Left Lead",
               "type": "Working"
             }
           ]
@@ -191,7 +191,7 @@
                 "M"
               ],
               "action": "Straight",
-              "gait": "Canter-Left-Lead",
+              "gait": "Canter Left Lead",
               "type": "Medium Strides"
             }
           ]
@@ -211,7 +211,7 @@
                 "H"
               ],
               "action": "Left",
-              "gait": "Canter-Left-Lead",
+              "gait": "Canter Left Lead",
               "type": "Working"
             }
           ]
@@ -331,7 +331,7 @@
                 "E"
               ],
               "action": "Straight-End",
-              "gait": "Canter-Right-Lead",
+              "gait": "Canter Right Lead",
               "type": "Working"
             }
           ]
@@ -350,7 +350,7 @@
                 "H"
               ],
               "action": "Right",
-              "gait": "Canter-Right-Lead",
+              "gait": "Canter Right Lead",
               "type": "Working"
             }
           ]
@@ -365,7 +365,7 @@
                 "M"
               ],
               "action": "Right",
-              "gait": "Canter-Right-Lead",
+              "gait": "Canter Right Lead",
               "type": "Working"
             }
           ]
@@ -385,7 +385,7 @@
                 "F"
               ],
               "action": "Straight",
-              "gait": "Canter-Right-Lead",
+              "gait": "Canter Right Lead",
               "type": "Medium Strides"
             }
           ]
@@ -404,7 +404,7 @@
                 "A"
               ],
               "action": "Right",
-              "gait": "Canter-Right-Lead",
+              "gait": "Canter Right Lead",
               "type": "Working"
             }
           ]

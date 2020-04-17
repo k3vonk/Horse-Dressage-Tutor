@@ -1,3 +1,9 @@
+/**
+ * Custom Slider is a function that creates a slider similar to the one on MaterialUI
+ *
+ * @author: Ga Jun Young
+ */
+
 import {withStyles} from "@material-ui/core";
 import Slider from "@material-ui/core/Slider";
 

@@ -1,42 +1,57 @@
+/**
+ * SceneManager class : manages all the scene components, camera, and renderer
+ *
+ * @author: Ga Jun Young
+ */
 import * as THREE from 'three';
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
-import Helper from "./components/scene/Helper";
-import Ground from "./components/scene/Ground";
-import {defaultCameraOptions} from "./utils/Constants";
-import Fences from "./components/scene/Fences";
-import Lighting from "./components/scene/Lighting";
-
+import Helper from "../components/Helper";
+import Ground from "../components/Ground";
+import {defaultCameraOptions} from "./Constants";
+import Fences from "../components/Fences";
+import Lighting from "../components/Lighting";
+import {Font} from "three";
+import Letters from "../components/Letters";
+import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
+import HorseManager from "../components/HorseManager";
 
 class SceneManager {
     private readonly canvas: HTMLCanvasElement;
     private readonly camera: THREE.PerspectiveCamera;
+    private readonly orbitControls: OrbitControls;
+    private animationSpeed = 0.005;
     private animationFrameID?: number;
+    private prevTime = Date.now();
+
     scene: THREE.Scene;
     renderer: THREE.Renderer;
+    horseManager: HorseManager;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.scene = this.buildScene();
         this.renderer = this.buildRender();
         this.camera = this.buildCamera();
-        this.buildOrbitControls();
+        this.orbitControls = this.buildOrbitControls();
         this.animationFrameID = undefined;
 
         // Add Subjects to Scene
         this.scene.add(this.camera);
         this.createStaticSceneSubjects();
-
-        // setup timeline
-        //const animation = new DressageTimeline(this.horse.getHorse());
-        //this.dressageTimeline = animation.getTimeline();
     }
 
+    /**
+     * Build scene, the container for other 3D objects
+     */
     private buildScene(): THREE.Scene {
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color("#FFF");
+        scene.background = new THREE.Color("#323232");
         return scene;
     }
 
+    /**
+     * Build renderer to render the scene components
+     */
     private buildRender(): THREE.Renderer {
         const renderer = new THREE.WebGLRenderer({canvas: this.canvas, antialias: true, alpha: true});
         const DPR = window.devicePixelRatio ? window.devicePixelRatio: 1;
@@ -45,6 +60,9 @@ class SceneManager {
         return renderer;
     }
 
+    /**
+     * Build camera, the perspective that users see from
+     */
     private buildCamera(): THREE.PerspectiveCamera {
         const aspectRatio = this.canvas.width / this.canvas.height;
         const fieldOfView = defaultCameraOptions.fieldOfView;
@@ -54,21 +72,38 @@ class SceneManager {
         const camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane);
 
         // Starting rotation at 30 degrees
-        camera.rotation.set(30 * Math.PI/180, 0, 0 );
+        camera.rotation.set(20 * Math.PI/180, 0, 0 );
 
         // camera starting position
         const initialCameraPositionY = -Math.tan(camera.rotation.x)*zDistance;
         const initialCameraPositionX = Math.tan(camera.rotation.y)*Math.sqrt(zDistance**2 + initialCameraPositionY**2);
         camera.position.set(initialCameraPositionX, initialCameraPositionY, zDistance);
-
+        camera.up.set( 0, 0, 1 );
         return camera;
     }
 
-    private buildOrbitControls() {
+    /**
+     * Build the scene controller.
+     * Capable of : Rotation, Zooming
+     */
+    private buildOrbitControls(): OrbitControls {
         const orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
-        orbitControls.update();
+
+        // rotation min - max
+        orbitControls.maxPolarAngle = Math.PI/180 * 85; // max 85 degree
+        orbitControls.minPolarAngle = Math.PI/180 * 20; // min 20 degree
+
+        // zoom min - max
+        orbitControls.minDistance = 10;
+        orbitControls.maxDistance = 40;
+
+        orbitControls.enablePan = false;
+        return orbitControls;
     }
 
+    /**
+     * Scene subjects that does not need to be updated besides being visible on the view
+     */
     private createStaticSceneSubjects() {
         new Helper(this.scene);
         new Ground(this.scene);
@@ -76,12 +111,26 @@ class SceneManager {
         new Fences(this.scene);
     }
 
+    /**
+     * Public render function that renders the scene on callbacks
+     */
     render(): void {
-        // Update subjects if necessary
+        // Render & Update subjects if necessary
         this.renderer.render(this.scene, this.camera);
+        this.orbitControls.update();
         this.animationFrameID = requestAnimationFrame(this.render.bind(this)); // call back to get ID
+
+        if(this.horseManager.mixer) {
+            const time = Date.now();
+            this.horseManager.mixer.update(( time - this.prevTime ) * this.animationSpeed);
+            this.prevTime = time;
+        }
     }
 
+    /**
+     * Callback event that changes the camera view and the size of the renderering
+     * when the canvas changes
+     */
     onWindowResize(): void {
         const {width, height} = this.canvas;
 
@@ -89,6 +138,23 @@ class SceneManager {
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(width, height); // adjust size of rendering screen
+    }
+
+    /**
+     * Add letters relevant to a novice horse dressage arena
+     * @param font
+     */
+    addLetters(font: Font) {
+        new Letters(this.scene, font);
+    }
+
+    /**
+     * Instantiate the horse manager class and add the horse component to the scene
+     * @param horseGLTF
+     */
+    addHorse(horseGLTF: GLTF): HorseManager {
+        this.horseManager = new HorseManager(this.scene, horseGLTF);
+        return this.horseManager;
     }
 
 }

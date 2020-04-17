@@ -1,3 +1,9 @@
+/**
+ * LoadManager class : Utilizes ThreeJS LoadingManager to enable multiple different file loading
+ * Provides messages to the console when loading starts, progresses, and finished loading
+ *
+ * @author: Ga Jun Young, 16440714
+ */
 import * as THREE from 'three';
 import {Font} from "three";
 import {GLTF, GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
@@ -24,6 +30,9 @@ class LoadManager {
 
     }
 
+    /**
+     * Font is loaded using Font Loader and attach it to the LoadManager
+     */
     loadFont() {
         const loader = new THREE.FontLoader(this.manager);
 
@@ -32,14 +41,21 @@ class LoadManager {
         }, LoadManager.onProgress);
     }
 
+    /**
+     * GLTF files are loaded using GLTFLoader and is attached to the LoadManager
+     */
     loadHorse() {
         const loader = new GLTFLoader(this.manager);
-        loader.load('/assets/models/scene.gltf', (gltf) => {
+        loader.load('/assets/models/low_poly_horse_with_animation.gltf', (gltf) => {
             this.horseGLTF = gltf;
             console.log(this.dumpObject(gltf.scene).join('\n'));
         },  LoadManager.onProgress);
     }
 
+    /**
+     * Receives a value to calculate how much of the file is loaded
+     * @param xhr
+     */
     private static onProgress(xhr ) {
         if (xhr.lengthComputable ) {
             let percentComplete = xhr.loaded / xhr.total * 100;
@@ -47,7 +63,10 @@ class LoadManager {
         }
     }
 
-    // Read what is in the gltf file obtained from: https://threejsfundamentals.org/threejs/lessons/threejs-load-gltf.html
+    /**
+     * Read what is in the gltf file obtained from: https://threejsfundamentals.org/threejs/lessons/threejs-load-gltf.html
+     * Takes an object and checks the content of the file
+     */
     dumpObject(obj, lines = [], isLast = true, prefix = '') {
         const localPrefix = isLast ? '└─' : '├─';
         lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
