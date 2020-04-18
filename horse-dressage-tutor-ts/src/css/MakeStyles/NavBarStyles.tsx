@@ -131,17 +131,17 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
         },
         currItem: {
             width: '100%',
-            padding: 5,
+            padding: 10,
             textAlign: 'center',
             background: 'rgba(150,64,0, 0.5)',
         },
         activeItem: {
-            padding: 5,
+            padding: 10,
             textAlign: 'center',
             background: 'rgba(1,50,32, 0.5)',
         },
         item: {
-            padding: 5,
+            padding: 10,
             textAlign: 'center',
         },
         icon: {

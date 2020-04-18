@@ -41,6 +41,7 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
     useEffect(() => {
         timeline.play(); // play timeline...
         setIsDraggablePaused(false);
+
     },[props.dressageTimeline, timeline]);
 
     useEffect(()=> {

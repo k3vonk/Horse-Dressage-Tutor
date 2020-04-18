@@ -12,8 +12,7 @@ const AnimationControllerStyles = makeStyles((theme: Theme) =>
         root: {
             position: 'absolute',
             width: '100%',
-            top:'100vh',
-            transform:'translateY(-100%)',
+            bottom: '0%',
             background: 'rgba(0,0,0,0.5)',
         },
         dressageName: {
@@ -73,3 +72,6 @@ const AnimationControllerStyles = makeStyles((theme: Theme) =>
 );
 
 export default AnimationControllerStyles;
+
+//             top:'100vh',
+//             transform:'translateY(-100%)',
