@@ -26,7 +26,7 @@ export const defaultCameraOptions: CameraOptions = {
     nearPlane: 0.1,
     farPlane: 1000,
     fieldOfView: 75,
-    zDistance: 20
+    zDistance: 20,
 };
 
 export const defaultLetterStyles: LetterStyle = {
@@ -62,6 +62,20 @@ export const defaultFenceOptions: FenceOptions = {
         depth: 1
     }
 };
+
+export const BIG_DEVICE_RATIO = 1.5;
+
+export const SCREEN_DECREASE_RATIO = {
+    LARGE: 0.7,
+    MEDIUM: 0.5,
+    SMALL: 0
+};
+
+export const ADJUST_Z_DISTANCE = {
+    LARGE: 60,
+    MEDIUM: 15,
+    SMALL: 10,
+}
 
 export const MAX_Y_AXIS: number = 7;
 export const MIN_Y_AXIS: number = -7;

@@ -10,6 +10,13 @@ import Slider from "@material-ui/core/Slider";
 const CustomSlider = withStyles({
     root: {
         color: '#1699b9',
+        height: 0,
+    },
+    marked: {
+        marginBottom: 0,
+        '@media (min-width:800px)': {
+            marginBottom: 8,
+        },
     },
     mark: {
         backgroundColor: '#e26e46',
@@ -22,28 +29,42 @@ const CustomSlider = withStyles({
     },
     markLabel: {
         color: 'rgba(255,255,255,0.4)',
+        display: 'none',
         '&[data-index="1"]': {
             color: '#ffffff'
         },
-        '@media (min-width:400px)': {
-            fontSize: '0rem',
-        },
         '@media (min-width:800px)': {
             fontSize: '0.7rem',
+            display: 'block',
         }
     },
     markLabelActive: {
       color: 'rgba(255,255,255,0.8)'
     },
     thumb: {
-        height: 24,
-        width: 24,
+        height: 0,
+        width: 0,
+        marginTop: 0,
+        marginLeft: 0,
         backgroundColor: 'rgba(81,187,213,0.4)',
-        border: '4px solid currentColor',
-        marginTop: -9,
-        marginLeft: -12,
-        '&:focus, &:hover, &active': {
+        border: '0px solid currentColor',
+        '&:focus, &:hover, &:active': {
             boxShadow: 'inherit',
+        },
+        '&:hover': {
+            height: 14,
+            width: 14,
+            marginTop: -4.5,
+            marginLeft: -8,
+            backgroundColor: 'rgba(81,187,213,0.4)',
+            border: '2px solid currentColor',
+            '@media (min-width:900px)': {
+                height: 24,
+                width: 24,
+                marginTop: -9,
+                marginLeft: -12,
+                border: '4px solid currentColor',
+            },
         },
     },
     track: {

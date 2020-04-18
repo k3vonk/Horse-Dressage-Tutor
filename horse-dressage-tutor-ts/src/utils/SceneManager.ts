@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import Helper from "../components/Helper";
 import Ground from "../components/Ground";
-import {defaultCameraOptions} from "./Constants";
+import {ADJUST_Z_DISTANCE, BIG_DEVICE_RATIO, defaultCameraOptions, SCREEN_DECREASE_RATIO} from "./Constants";
 import Fences from "../components/Fences";
 import Lighting from "../components/Lighting";
 import {Font} from "three";
@@ -68,7 +68,9 @@ class SceneManager {
         const fieldOfView = defaultCameraOptions.fieldOfView;
         const nearPlane = defaultCameraOptions.nearPlane;
         const farPlane = defaultCameraOptions.farPlane;
-        const zDistance = defaultCameraOptions.zDistance;
+        let zDistance = defaultCameraOptions.zDistance;
+        zDistance = this.zDistanceIncrease(zDistance);
+
         const camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane);
 
         // Starting rotation at 30 degrees
@@ -83,6 +85,30 @@ class SceneManager {
     }
 
     /**
+     * Adjust the starting zDistance based on the screen ratio size at the start
+     * @param zDistance
+     */
+    private zDistanceIncrease(zDistance: number) {
+        let screenDecreaseRatio = 1 - (window.innerWidth * window.innerHeight) / (1536 * 754);
+
+        if (window.devicePixelRatio < BIG_DEVICE_RATIO) { // bigger devices
+            if (screenDecreaseRatio > SCREEN_DECREASE_RATIO.LARGE) {
+                zDistance += (screenDecreaseRatio * ADJUST_Z_DISTANCE.MEDIUM);
+            } else if (screenDecreaseRatio > SCREEN_DECREASE_RATIO.MEDIUM) {
+                zDistance += (screenDecreaseRatio * ADJUST_Z_DISTANCE.SMALL);
+            } else if (screenDecreaseRatio > SCREEN_DECREASE_RATIO.SMALL) {
+                zDistance += (screenDecreaseRatio * ADJUST_Z_DISTANCE.MEDIUM);
+            } else if (screenDecreaseRatio < SCREEN_DECREASE_RATIO.SMALL) {
+                zDistance += -(screenDecreaseRatio * ADJUST_Z_DISTANCE.LARGE);
+            }
+        } else { // smaller devices
+            zDistance += (screenDecreaseRatio * ADJUST_Z_DISTANCE.LARGE);
+        }
+
+        return zDistance;
+    }
+
+    /**
      * Build the scene controller.
      * Capable of : Rotation, Zooming
      */
@@ -91,13 +117,12 @@ class SceneManager {
 
         // rotation min - max
         orbitControls.maxPolarAngle = Math.PI/180 * 85; // max 85 degree
-        orbitControls.minPolarAngle = Math.PI/180 * 20; // min 20 degree
+        orbitControls.minPolarAngle = Math.PI/180; // min 20 degree
 
         // zoom min - max
         orbitControls.minDistance = 10;
-        orbitControls.maxDistance = 40;
+        orbitControls.maxDistance = 52;
 
-        orbitControls.enablePan = false;
         return orbitControls;
     }
 

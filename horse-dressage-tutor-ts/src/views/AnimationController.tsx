@@ -112,7 +112,7 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
 
     // ==================   Callback functions   ==================
     /**
-     * When slider is pressed, pause the progress of the timeline and horse animation
+     * When slider is pressed, pause the progress of the timeline
      * @param object : not used.
      * @param value
      */
@@ -120,7 +120,6 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
         setSliderValue(value);
         timeline.progress(value / timeline.totalDuration());
         timeline.pause();
-        props.horseManager.pauseMixer();
     };
 
     /**
@@ -130,6 +129,7 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
      */
     const onSliderCommitted = function(object, value: number) {
         setSliderValue(value);
+        props.horseManager.pauseMixer(); // pause the horses animation
         if (!isDraggablePaused) // if the video was originally being played...
             timeline.play();
     };
@@ -192,7 +192,6 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
 
     return (
         <React.Fragment>
-
             <NavBar timeline={timeline} progress={sliderValue} horseManager={props.horseManager}/>
 
             <div className={classes.root}>
@@ -202,19 +201,8 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
                     justify="center"
                     alignItems="center"
                 >
-                    <Grid item md={3} xs={12}>
-                        <h2 className={classes.h2}>{props.title}</h2>
-                    </Grid>
 
-                    <Grid item xs={"auto"}>
-                        {drawControllerButtons()}
-                    </Grid>
-
-                    <Grid item lg={"auto"} sm={1} xs={2}>
-                        <h6 className={classes.h6}>{timeConvert(timeline.time())}</h6>
-                    </Grid>
-
-                    <Grid item lg={6} md={5} sm={6} xs={4}>
+                    <Grid item xs={11}>
                         <CustomSlider
                             min={0.0}
                             max={timeline.totalDuration()}
@@ -226,11 +214,32 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
                         />
                     </Grid>
 
-                    <Grid item lg={"auto"} sm={1} xs={2}>
-                        <h6 className={classes.h6}>{timeConvert(timeline.totalDuration())}</h6>
+                </Grid>
+
+                <Grid container
+                      direction="row"
+                      justify="center"
+                      alignItems="center"
+                >
+                    <Grid item xs={5}>
+                        <Grid container alignItems="center">
+                            <Grid item >
+                                {drawControllerButtons()}
+                            </Grid>
+
+                            <Grid item>
+                                <p className={classes.time}>{timeConvert(timeline.time()) + " / " + timeConvert(timeline.totalDuration())}</p>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                        <p className={classes.dressageName}>{props.title}</p>
                     </Grid>
 
                 </Grid>
+
+
             </div>
 
         </React.Fragment>
@@ -239,11 +248,6 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
 
 /*
 
-        timeline.eventCallback("onUpdate", () =>{
-            setSliderValue(timeline.progress() * timeline.totalDuration());
+            <NavBar timeline={timeline} progress={sliderValue} horseManager={props.horseManager}/>
 
-            // if the progress is finished, set replay.
-            if (timeline.progress() === 1) { setIsReplay(true); }
-            else { setIsReplay(false);}
-        });
  */

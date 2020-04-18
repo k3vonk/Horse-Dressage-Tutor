@@ -140,7 +140,9 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
      * Draw the app bar's tools
      */
     function drawToolbar() {
-        return <Toolbar id='back-to-top-anchor'>
+        return <Toolbar
+            className={classes.toolbar}
+            id='back-to-top-anchor'>
             <IconButton
                 color="inherit"
                 aria-label="open drawer"
@@ -150,7 +152,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
             >
                 <MenuIcon/>
             </IconButton>
-            <Typography className={classes.title} variant="subtitle1"
+            <Typography className={clsx(classes.title, open && classes.hideTitle)} variant="subtitle1"
                         aria-label="dressage step">{props.timeline.currentLabel()}</Typography>
         </Toolbar>;
     }
@@ -191,13 +193,13 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                 {drawBackButton()}
                 <Divider className={classes.divider}/>
                 {drawerList()}
-
             </Drawer>
         </div>
     );
 };
 
 /*
+
             <ScrollToTopZoom {...props}>
                 <Fab color="secondary" size="small" aria-label="scroll back to top">
                     <KeyboardArrowUpIcon />

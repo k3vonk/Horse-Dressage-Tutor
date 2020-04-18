@@ -28,18 +28,18 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
                 duration: theme.transitions.duration.leavingScreen,
             }),
 
-            '@media (min-width: 600px)': {
+            '@media (min-width: 500px)': {
                 height: appBarHeight
             },
         },
         appBarShift: {
-            width: `calc(100% - ${drawerWidthAt600px}px)`,
+            width: `calc(100% - 100%)`,
             marginLeft: drawerWidthAt600px,
             transition: theme.transitions.create(['margin', 'width'], {
                 easing: theme.transitions.easing.easeOut,
                 duration: theme.transitions.duration.enteringScreen,
             }),
-            '@media (min-width: 600px)': {
+            '@media (min-width: 500px)': {
                 width: `calc(100% - ${drawerWidthAt600px}px)`,
                 marginLeft: drawerWidthAt600px,
             },
@@ -48,41 +48,47 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
                 marginLeft: drawerWidthAt1000px,
             },
         },
+        toolbar: {
+            height: appBarHeightBelow600px,
+            '@media (min-width: 500px)': {
+                height: appBarHeight
+            },
+        },
+        hideTitle: {
+            '@media only screen and (max-width: 499px)':{
+                display: 'none',
+            },
+        },
         hide: {
             display: 'none',
         },
         menuButton: {
             justifySelf: 'flex-start',
-            padding: 30,
-            '@media (min-width: 600px)': {
-                paddingLeft: 20,
-            },
+            border: '2px solid transparent',
+            borderRadius: 0,
+            padding: 10,
         },
         title: {
             flexGrow: 1,
             textAlign: 'center',
-            padding: 10,
-            '@media (min-width: 600px)': {
-                padding: 0,
+            '@media (min-width: 300px)': {
+                fontSize: '0.8em',
+                fontWeight: 'bold',
             },
+            '@media (min-width: 800px)': {
+                fontSize: '1em',
+            }
         },
         drawer: {
-            width: drawerWidthAt600px,
             flexShrink: 0,
-            '@media (min-width: 600px)': {
-                width: drawerWidthAt600px,
-            },
-            '@media (min-width: 1000px)': {
-                width: drawerWidthAt1000px,
-            },
         },
         paper: {
             position: 'absolute',
             height: '30vh',
-            width: drawerWidthAt600px,
+            width: '99.5%',
             background: 'rgba(67, 67, 67, 0.3)',
             color: 'white',
-            '@media (min-width: 600px)': {
+            '@media (min-width: 500px)': {
                 width: drawerWidthAt600px,
                 height: '30vh'
             },
@@ -94,24 +100,26 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
                 height: '40vh'
             },
             '@media (min-width: 1400px)': {
-                height: '55vh'
+                height: '80vh'
             },
         },
         backContainer: {
             display: 'flex',
             background: '#D7E0E9',
-            height: appBarHeight,
+            height: appBarHeightBelow600px,
+            '@media (min-width: 500px)': {
+                height: appBarHeight
+            },
             '@media (min-width: 1000px)': {
                 position:"fixed",
-                width: drawerWidthAt1000px - 17,
-                overflow: 'hidden',
+                width: drawerWidthAt1000px,
             },
         },
         backButton: {
             width: '100%',
             borderRadius: 0,
-            paddingBottom: 50,
-
+            paddingTop: 10,
+            paddingBottom: 10,
         },
         backText: {
             textAlign: 'left',
