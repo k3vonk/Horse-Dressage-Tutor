@@ -99,14 +99,12 @@ export interface Point {
     y: number
 }
 
-
-export interface NavBarProps {
-    timeline: GSAPTimeline,
-    progress: number,
-    horseManager: HorseManager,
-}
-
 export interface Label {
     text: string,
     progress: number,
+}
+
+export interface NavBarProps{
+    timeline: GSAPTimeline,
+    horseManager: HorseManager,
 }

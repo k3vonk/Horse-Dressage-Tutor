@@ -1,10 +1,9 @@
 /**
- * Style for the navigation bar
+ * Style for the navigation bar (CSS-JS)
  *
  * @author: Ga Jun Young
  */
 
-import {makeStyles} from "@material-ui/core/styles";
 import {createStyles, Theme} from "@material-ui/core";
 
 const drawerWidthAt600px = 240;
@@ -12,8 +11,7 @@ const drawerWidthAt1000px = 300;
 const appBarHeightBelow600px = 75;
 const appBarHeight = 60;
 
-export const NavBarStyles = makeStyles((theme: Theme) =>
-    createStyles({
+const NavBarStyles = (theme: Theme) => createStyles({
         root: {
             flexGrow: 1,
             height: '10vh',
@@ -46,6 +44,22 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
             '@media (min-width: 1000px)': {
                 width: `calc(100% - ${drawerWidthAt1000px}px)`,
                 marginLeft: drawerWidthAt1000px,
+            },
+        },
+        appBarShiftRight: {
+            width: `calc(100% - 100%)`,
+            marginRight: drawerWidthAt600px,
+            transition: theme.transitions.create(['margin', 'width'], {
+                easing: theme.transitions.easing.easeOut,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+            '@media (min-width: 500px)': {
+                width: `calc(100% - ${drawerWidthAt600px}px)`,
+                marginRight: drawerWidthAt600px,
+            },
+            '@media (min-width: 1000px)': {
+                width: `calc(100% - ${drawerWidthAt1000px}px)`,
+                marginRight: drawerWidthAt1000px,
             },
         },
         toolbar: {
@@ -84,6 +98,7 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
         },
         paper: {
             position: 'absolute',
+            overflow: 'auto',
             height: '30vh',
             width: '99.5%',
             background: 'rgba(67, 67, 67, 0.3)',
@@ -108,11 +123,11 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
             background: '#D7E0E9',
             height: appBarHeightBelow600px,
             '@media (min-width: 500px)': {
-                height: appBarHeight
+               height: appBarHeight
             },
             '@media (min-width: 1000px)': {
-                position:"fixed",
-                width: drawerWidthAt1000px,
+                //position:"fixed",
+               // width: drawerWidthAt1000px,
             },
         },
         backButton: {
@@ -125,12 +140,8 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
             textAlign: 'left',
         },
         divider: {
-            '@media (min-width: 1000px)': {
-                paddingTop: appBarHeight,
-            },
         },
         currItem: {
-            width: '100%',
             padding: 10,
             textAlign: 'center',
             background: 'rgba(150,64,0, 0.5)',
@@ -145,9 +156,10 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
             textAlign: 'center',
         },
         icon: {
-            top: 100
+           top: 100
         },
         itemButton: {
+            width: '100%',
             background: 'none',
             color: 'inherit',
             border: 'none',
@@ -156,5 +168,6 @@ export const NavBarStyles = makeStyles((theme: Theme) =>
             cursor: 'pointer',
             outline: 'inherit',
         }
-    }),
-);
+    });
+
+export default NavBarStyles;

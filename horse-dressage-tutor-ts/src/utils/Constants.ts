@@ -98,7 +98,36 @@ export const CENTER_LETTERS: CenterLetters = {
     G: new Vector3(-11.2, 0, 0)
 };
 
-export const LETTERS = {START, ...CENTER_LETTERS, ...EDGE_LETTERS};
+export const LEFT_COLUMN_LETTERS = {
+    M: new Vector3(-11.2, 7, 0),
+    G: new Vector3(-11.2, 0, 0),
+    H: new Vector3(-11.2, -7, 0),
+};
+
+export const RIGHT_COLUMN_LETTERS = {
+    F: new Vector3(11.2, 7, 0),
+    D: new Vector3(11.2, 0, 0),
+    K: new Vector3(11.2, -7, 0),
+};
+
+export const TOP_3QUARTER_LINE = {
+  F3: new Vector3(11.2, 3.5, 0),
+  B3: new Vector3(0, 3.5, 0),
+  BM3: new Vector3(-5.6, 3.5, 0),
+  M3: new Vector3(-11.2, 3.5, 0),
+};
+
+export const BOTTOM_3QUARTER_LINE = {
+    F1: new Vector3(11.2, -3.5, 0),
+    B1: new Vector3(0, -3.5, 0),
+    BM1: new Vector3(-5.6, -3.5, 0),
+    M1: new Vector3(-11.2, -3.5, 0),
+};
+
+export const X1 = new Vector3(0, -3.5, 0);
+export const X3 = new Vector3(0, 3.5, 0);
+
+export const LETTERS = {START,X1, X3, ...CENTER_LETTERS, ...EDGE_LETTERS, ...TOP_3QUARTER_LINE, ...BOTTOM_3QUARTER_LINE};
 
 export const FINAL_STEP: Step = {
     position:["START"],

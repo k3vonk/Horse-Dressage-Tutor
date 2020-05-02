@@ -4,11 +4,9 @@
  * @author: Ga Jun Young
  */
 
-import {makeStyles} from "@material-ui/core/styles";
-import {createStyles, Theme} from "@material-ui/core";
+import {createStyles} from "@material-ui/core";
 
-const AnimationControllerStyles = makeStyles((theme: Theme) =>
-    createStyles({
+const AnimationControllerStyles = () => createStyles({
         root: {
             position: 'absolute',
             width: '100%',
@@ -42,7 +40,7 @@ const AnimationControllerStyles = makeStyles((theme: Theme) =>
             },
             '@media (min-width: 500px)': {
                 fontSize: '0.8em',
-                margin: 15,
+                margin: 10.6,
             },
             '@media (min-width: 800px)': {
                 fontSize: '1.1em',
@@ -53,7 +51,6 @@ const AnimationControllerStyles = makeStyles((theme: Theme) =>
             border: '2px solid transparent',
             borderRadius: 0,
             padding: 0,
-
             '&:focus, &:hover, &:active': {
                 color: 'rgba(255,255,255,1)',
             },
@@ -67,11 +64,14 @@ const AnimationControllerStyles = makeStyles((theme: Theme) =>
             '@media (min-width: 800px)': {
                 padding: 12,
             }
+        },
+        activeIconButton: {
+            color: 'rgba(255,255,255,1)',
+        },
+        svg: {
+            height: '20px',
+            width: '20px',
         }
-    }),
-);
+    });
 
 export default AnimationControllerStyles;
-
-//             top:'100vh',
-//             transform:'translateY(-100%)',

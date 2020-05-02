@@ -10,21 +10,24 @@ import LoadManager from "./utils/LoadManager";
 import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
 import {Font} from "three";
 import {DressageTest} from "./utils/types";
-import Container from './views/Container';
+import {Container} from "./views/Container";
 
-const noviceSheet2012 = "./sample/novice_dressage_110_2012.json";
+const DRESSAGE_SHEETS =["./sample/novice_dressage_110_2012.json",
+    "./sample/ipc_novice_dressage_championship_2017.json",
+    "./sample/airc_novice_dressage_22_2020.json"];
+
 interface LoadState {
     loading: boolean,
-    dressageSheet: DressageTest,
+    dressageSheets: DressageTest[],
     horseGLTF: GLTF,
     font: Font,
 }
 
-export default class App extends React.Component {
-    loadManager = new LoadManager();
+export default class App extends React.PureComponent {
+    private loadManager = new LoadManager();
     state: LoadState = {
         loading: true,
-        dressageSheet: null,
+        dressageSheets: [],
         horseGLTF: null,
         font: null,
     };
@@ -49,30 +52,36 @@ export default class App extends React.Component {
     }
 
     /**
-     * Fetches the dressage sheet
+     * Fetches the dressage sheets
      */
     private fetchDressageSheet = () => {
-        fetch(noviceSheet2012)
-            .then(res => res.json())
-            .then(data => {
-                this.setState({
-                    dressageSheet: data,
-                    loading: false
+        for(let i = 0; i < DRESSAGE_SHEETS.length; i++) {
+            fetch(DRESSAGE_SHEETS[i])
+                .then(res => res.json())
+                .then(data => {
+                    this.setState({
+                        dressageSheets: [...this.state.dressageSheets, data]
+                    });
+
+                    if(i === DRESSAGE_SHEETS.length - 1) {
+                        this.setState({loading: false})
+                    }
                 })
-            })
-            .catch(error => {
-                console.log("Dressage sheet cannot be read: " + error);
-            });
+                .catch(error => {
+                    console.log("Dressage sheet cannot be read: " + error);
+                });
+        }
     };
 
     /**
      * Render the components
      */
-    render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> | string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
+    render(): React.ReactElement| string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
         if (this.state.loading) { return <Loader />; }
 
         // loaded content as props for our container
-        const { dressageSheet, horseGLTF, font } = this.state;
-        return <Container  dressageSheet={dressageSheet} horseGLTF={horseGLTF} font={font}/>
+        const { dressageSheets, horseGLTF, font } = this.state;
+        console.log(dressageSheets);
+        return <Container dressageSheets={dressageSheets} horseGLTF={horseGLTF} font={font}/>
     }
 }

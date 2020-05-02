@@ -1,0 +1,687 @@
+{
+  "name": "AIRC Novice Dressage Test 22 (2020)",
+  "tests": [
+    {
+      "index": 1,
+      "subTests": [
+        {
+          "name": "A. Enter at working trot and proceed down centre line without halting",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "G"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "C. Turn right",
+          "steps": [
+            {
+              "position": [
+                "G",
+                "M"
+              ],
+              "action": "Right-Midpoint",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "M",
+                "B"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "subTests": [
+        {
+          "name": "B. Circle right 15 metres",
+          "steps": [
+            {
+              "position": [
+                "B",
+                "X1"
+              ],
+              "action": "Half-Circle-Right-15",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "X1",
+                "B"
+              ],
+              "action": "Half-Circle-Right-15",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "BFA. Working trot",
+          "steps": [
+            {
+              "position": [
+                "B",
+                "F"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "F",
+                "A"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "subTests": [
+        {
+          "name": "A. Half circle right 20 metres diameter to X",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "X"
+              ],
+              "action": "Half-Circle-Right-20",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "X. Half circle left 20 metres diameter to C",
+          "steps": [
+            {
+              "position": [
+                "X",
+                "C"
+              ],
+              "action": "Half-Circle-Left-20",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "CHE. Working trot",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "H",
+                "E"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "subTests": [
+        {
+          "name": "E. Circle left 15 metres diameter",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "X3"
+              ],
+              "action": "Half-Circle-Left-15",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "X3",
+                "E"
+              ],
+              "action": "Half-Circle-Left-15",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "EKA. Working trot",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "K"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "K",
+                "A"
+              ],
+              "action": "Left",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "subTests": [
+        {
+          "name": "A. Half circle left 20 metres diameter to X",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "X"
+              ],
+              "action": "Half-Circle-Left-20",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "X. Half circle right 20 metres diameter to C",
+          "steps": [
+            {
+              "position": [
+                "X",
+                "C"
+              ],
+              "action": "Half-Circle-Right-20",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "CM. Working trot",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "M"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "subTests": [
+        {
+          "name": "MXK. Change rein and show some lengthened strides",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "X",
+                "K"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "KAF. Working trot",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "A",
+                "F"
+              ],
+              "action": "Left",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "subTests": [
+        {
+          "name": "FXH. Change rein and show some lengthened strides",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "X",
+                "H"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "HC. Working trot",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "C"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "subTests": [
+        {
+          "name": "Between C&M. Working canter",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "M"
+              ],
+              "action": "Right",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "MBFA. Working canter",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "B",
+                "F"
+              ],
+              "action": "Straight",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "F",
+                "A"
+              ],
+              "action": "Right",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "subTests": [
+        {
+          "name": "A. Circle right 20 metres diameter",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "X"
+              ],
+              "action": "Half-Circle-Right-20",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "X",
+                "A"
+              ],
+              "action": "Half-Circle-Right-20",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "A",
+                "K"
+              ],
+              "action": "Right",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "KXM. Change rein with a transition to working trot over X",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "X",
+                "M"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "subTests": [
+        {
+          "name": "Between M&C. Working canter",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "C"
+              ],
+              "action": "Left",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "HEK. Show some lengthened strides",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "E",
+                "K"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Medium Strides"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "subTests": [
+        {
+          "name": "KA. Working canter",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "A"
+              ],
+              "action": "Left",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "A. Circle left 20 metres diameter",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "X"
+              ],
+              "action": "Half-Circle-Left-20",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "X",
+                "A"
+              ],
+              "action": "Half-Circle-Left-20",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "subTests": [
+        {
+          "name": "AFBM. Working canter",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "F"
+              ],
+              "action": "Left",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "F",
+                "B",
+                "M"
+              ],
+              "action": "Straight",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "subTests": [
+        {
+          "name": "M. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "C"
+              ],
+              "action": "Left",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "C. Medium walk",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "subTests": [
+        {
+          "name": "HXF. Change rein in free walk on a long rein",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "X",
+                "F"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Walk",
+              "type": "Free"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "subTests": [
+        {
+          "name": "F. Medium walk",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "D"
+              ],
+              "action": "Right-Midpoint",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        },
+        {
+          "name": "A. Turn down centre line",
+          "steps": [
+            {
+              "position": [
+                "D"
+              ],
+              "action": "Halt",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        },
+        {
+          "name": "D. Working trot",
+          "steps": [
+            {
+              "position": [
+                "D",
+                "G"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "G. Halt, Immobility, Salute. Leave arena on a long rein where appropriate",
+          "steps": [
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Halt",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Immobility",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Salute",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left-Midpoint",
+              "gait": "Walk",
+              "type": "Free"
+            },
+            {
+              "position": [
+                "H",
+                "E",
+                "K"
+              ],
+              "action": "Straight",
+              "gait": "Walk",
+              "type": "Free"
+            },
+            {
+              "position": [
+                "K",
+                "A",
+                "START"
+              ],
+              "action": "Exit",
+              "gait": "Walk",
+              "type": "Free"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

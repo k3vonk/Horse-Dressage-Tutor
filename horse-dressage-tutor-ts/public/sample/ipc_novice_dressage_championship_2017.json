@@ -1,0 +1,674 @@
+{
+  "name": "IPC Novice Dressage Championship Test (2017)",
+  "tests": [
+    {
+      "index": 1,
+      "subTests": [
+        {
+          "name": "A. Enter in working Trot. Proceed down the centre line without halting",
+          "steps": [
+            {
+              "position": [
+                "START",
+                "C"
+              ],
+              "action": "Straight-End",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "C. Track Left",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left-Midpoint",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "H",
+                "E"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "subTests": [
+        {
+          "name": "E. Half circle left 10m diameter to X",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "X"
+              ],
+              "action": "Half-Circle-Left-10",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "X. Half circle right 10m diameter to B",
+          "steps": [
+            {
+              "position": [
+                "X",
+                "B"
+              ],
+              "action": "Half-Circle-Right-10",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "B",
+                "F"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "FK. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "A",
+                "K"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "subTests": [
+        {
+          "name": "KXM. Change the rein on the diagonal. Over X transition to walk for 2 - 5 steps. Proceed in working Trot",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "X",
+                "M"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "subTests": [
+        {
+          "name": "C. Turn up centre line",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "G"
+              ],
+              "action": "Left-Midpoint",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "G",
+                "D"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "A. Track right",
+          "steps": [
+            {
+              "position": [
+                "D",
+                "K"
+              ],
+              "action": "Right-Midpoint",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "K",
+                "E"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "subTests": [
+        {
+          "name": "E. Half circle left 10m diameter to X",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "X"
+              ],
+              "action": "Half-Circle-Right-10",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "X. Half circle right 10m diameter to B",
+          "steps": [
+            {
+              "position": [
+                "X",
+                "B"
+              ],
+              "action": "Half-Circle-Left-10",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "B",
+                "M"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "subTests": [
+        {
+          "name": "Btwn M&C. Working canter left",
+          "steps": [
+            {
+              "position": [
+                "M",
+                "C"
+              ],
+              "action": "Left",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "H",
+                "E"
+              ],
+              "action": "Straight",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "subTests": [
+        {
+          "name": "E. Circle left 20m diameter. Give and retake the inside rein on the second half of the circle.",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "B"
+              ],
+              "action": "Half-Circle-Left-20",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "B",
+                "E"
+              ],
+              "action": "Half-Circle-Left-20",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "EKA. Working canter",
+          "steps": [
+            {
+              "position": [
+                "E",
+                "K"
+              ],
+              "action": "Straight",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "K",
+                "A"
+              ],
+              "action": "Left",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "subTests": [
+        {
+          "name": "After A. Turn onto the 3/4 line. Between the BE line and the MH line make a transition to working trot",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "F3"
+              ],
+              "action": "Left",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "F3",
+                "BM3"
+              ],
+              "action": "Straight",
+              "gait": "Canter Left Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "BM3",
+                "M3"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "M3",
+                "C"
+              ],
+              "action": "Left",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "subTests": [
+        {
+          "name": "Btwn C&H. Transition to medium walk",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "subTests": [
+        {
+          "name": "HXF. On the diagonal free walk on a long rein",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "X",
+                "F"
+              ],
+              "action": "Curvy-Straight",
+              "gait": "Walk",
+              "type": "Free"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "subTests": [
+        {
+          "name": "FK. Medium walk",
+          "steps": [
+            {
+              "position": [
+                "F",
+                "A",
+                "K"
+              ],
+              "action": "Right",
+              "gait": "Walk",
+              "type": "Medium"
+            }
+          ]
+        },
+        {
+          "name": "K. Working trot",
+          "steps": [
+            {
+              "position": [
+                "K",
+                "H"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "subTests": [
+        {
+          "name": "Btwn H&C. Transition to working canter",
+          "steps": [
+            {
+              "position": [
+                "H",
+                "C",
+                "M"
+              ],
+              "action": "Right",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "M",
+                "B"
+              ],
+              "action": "Straight",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "subTests": [
+        {
+          "name": "B. Circle right 20m diameter. Give and retake the inside rein on the second half of the circle",
+          "steps": [
+            {
+              "position": [
+                "B",
+                "E"
+              ],
+              "action": "Half-Circle-Right-20",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "E",
+                "B"
+              ],
+              "action": "Half-Circle-Right-20",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "BF. Working canter",
+          "steps": [
+            {
+              "position": [
+                "B",
+                "F"
+              ],
+              "action": "Straight",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "F",
+                "A"
+              ],
+              "action": "Right",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "subTests": [
+        {
+          "name": "After A. Turn onto the 3/4 line. Between the EB line and HM make a transition to working trot.",
+          "steps": [
+            {
+              "position": [
+                "A",
+                "F1"
+              ],
+              "action": "Right",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "F1",
+                "BM1"
+              ],
+              "action": "Straight",
+              "gait": "Canter Right Lead",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "BM1",
+                "M1"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "M1",
+                "C"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "subTests": [
+        {
+          "name": "CB. Working Trot",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "M"
+              ],
+              "action": "Right",
+              "gait": "Trot",
+              "type": "Working"
+            },
+            {
+              "position": [
+                "M",
+                "B"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "B. Half circle 10m diameter to X",
+          "steps": [
+            {
+              "position": [
+                "B",
+                "X"
+              ],
+              "action": "Half-Circle-Right-10",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        },
+        {
+          "name": "X. Proceed down centre line towards G",
+          "steps": [
+            {
+              "position": [
+                "X",
+                "G"
+              ],
+              "action": "Straight",
+              "gait": "Trot",
+              "type": "Working"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 16,
+      "subTests": [
+        {
+          "name": "G. Halt. Immobility. Salute",
+          "steps": [
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Halt",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Immobility",
+              "gait": "",
+              "type": ""
+            },
+            {
+              "position": [
+                "G"
+              ],
+              "action": "Salute",
+              "gait": "",
+              "type": ""
+            }
+          ]
+        },
+        {
+          "name": "Leave The Arena at Free Walk on a Long Rein at A",
+          "steps": [
+            {
+              "position": [
+                "C",
+                "H"
+              ],
+              "action": "Left-Midpoint",
+              "gait": "Walk",
+              "type": "Free"
+            },
+            {
+              "position": [
+                "H",
+                "E",
+                "K"
+              ],
+              "action": "Straight",
+              "gait": "Walk",
+              "type": "Free"
+            },
+            {
+              "position": [
+                "K",
+                "A",
+                "START"
+              ],
+              "action": "Exit",
+              "gait": "Walk",
+              "type": "Free"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

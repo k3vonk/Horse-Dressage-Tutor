@@ -3,206 +3,210 @@
  *
  * @author: Ga Jun Young, 16440714
  */
-import React, {useEffect, useState} from "react";
-import {AppBar, Drawer, Grid, IconButton, ListItemText, Toolbar, Typography,} from "@material-ui/core";
+import React from "react";
+import {
+    AppBar,
+    IconButton,
+    Toolbar,
+    Typography,
+    withStyles,
+    WithStyles,
+} from "@material-ui/core";
 import MenuIcon from '@material-ui/icons/Menu';
-import {NavBarStyles} from "../css/MakeStyles/NavBarStyles";
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import CheckIcon from '@material-ui/icons/Check';
-import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
-import Divider from '@material-ui/core/Divider';
+import SettingsIcon from '@material-ui/icons/Settings';
+import NavBarStyles from "../css/MakeStyles/NavBarStyles";
 import clsx from 'clsx';
-import {Label, NavBarProps} from "../utils/types";
+import {DressageTest, Label} from "../utils/types";
+import HorseManager from "../components/HorseManager";
+import DrawerLeft from "./DrawerLeft";
+import DrawerRight from "./DrawerRight";
 
-export const NavBar: React.FC<NavBarProps> = (props) => {
-    const classes = NavBarStyles();
-    const [open, setOpen] = useState(false);
-    const [labels, setLabels] = useState<Label[]>([]);
 
-    // init - setup labels
-    useEffect(()=> {
-        if (labels.length === 0) {
-            let labels: Label[] = [];
-            for (let [key, value] of Object.entries(props.timeline.labels)) {
-                labels.push({
-                    text: key,
-                    progress: value
-                });
-            }
-            setLabels(labels);
-        }
+interface NavBarProps extends WithStyles<typeof NavBarStyles>{
+    currentSheet: string,
+    dressageSheets: DressageTest[],
+    timeline: GSAPTimeline,
+    horseManager: HorseManager,
+    changeDressageFunction: (index:number) => void,
+    handleResetView: () =>void,
+}
 
-    }, [labels.length, props.timeline.labels]);
+interface NavBarStates {
+    leftOpen: boolean,
+    rightOpen: boolean,
+    waitPeriod: number,
+    lastTimeScrolled: number,
+    progress: number,
+    title: string,
+    labels: Label[],
+}
 
+
+class NavBar extends React.Component<NavBarProps, NavBarStates> {
+
+    private interval;
+    constructor(props: NavBarProps) {
+        super(props);
+
+        this.state = {
+            leftOpen: false,
+            rightOpen: false,
+            waitPeriod: 800,
+            lastTimeScrolled: Date.now(),
+            progress: 0,
+            title: props.timeline.currentLabel(),
+            labels: null,
+        };
+
+        // bind functions for callback usage of 'this'
+        this.tick = this.tick.bind(this);
+        this.handleDrawerLeftOpen = this.handleDrawerLeftOpen.bind(this);
+        this.handleDrawerRightOpen = this.handleDrawerRightOpen.bind(this);
+        this.handleDrawerLeftClose = this.handleDrawerLeftClose.bind(this);
+        this.handleDrawerRightClose= this.handleDrawerRightClose.bind(this);
+        this.handleScroll = this.handleScroll.bind(this);
+        this.reloadNavBar = this.reloadNavBar.bind(this);
+    }
+
+    componentDidMount(): void {
+        this.interval = setInterval(() => this.tick(), 1000);
+    }
+
+    componentWillUnmount(): void {
+        clearInterval(this.interval);
+    }
+
+    reloadNavBar(index: number){
+        this.props.changeDressageFunction(index);
+        this.setState( {
+            leftOpen: false,
+            rightOpen: false,
+            waitPeriod: 800,
+            lastTimeScrolled: Date.now(),
+            progress: 0,
+            title: this.props.timeline.currentLabel(),
+            labels: null,
+        });
+    }
+    // ============== Callback functions
     /**
-     * Open drawer
+     * ticker to update a component
      */
-    const handleDrawerOpen = () => { setOpen(true); };
+    tick() {
+        this.setState({
+            progress: this.props.timeline.progress() * this.props.timeline.totalDuration()
+        });
 
-    /**
-     * Close drawer
-     */
-    const handleDrawerClose = () => { setOpen(false); };
-
-    /**
-     * Set the progress of the horse to the label.
-     * @param label
-     */
-    const handleListItem = (label: Label) => {
-        props.timeline.seek(label.progress + 0.0001, false);
-        if(!props.timeline.isActive()) {
-            props.horseManager.pauseMixer();
+        if(this.state.title !== this.props.timeline.currentLabel()) {
+            this.setState({title: this.props.timeline.currentLabel()})
         }
     };
 
-    /**
-     * Draw the label that is completed
-     * @param label
-     */
-    function drawCompleted(label: Label) {
-        return <Grid container
-                     direction="row"
-                     justify="center"
-                     alignItems="center"
-                     className={classes.currItem}>
-            <Grid item xs={3}><PlayArrowIcon/></Grid>
-            <Grid item xs={9}><h5>{label.text}</h5></Grid>
-        </Grid>;
+    handleDrawerLeftOpen() {
+        this.setState({
+            leftOpen: true,
+            rightOpen: false,
+        })
+    }
+
+    handleDrawerRightOpen() {
+        this.setState({
+            leftOpen: false,
+            rightOpen: true
+        })
+    }
+
+    handleDrawerLeftClose() {
+        this.setState({leftOpen: false})
+    }
+
+    handleDrawerRightClose() {
+        this.setState({rightOpen: false})
     }
 
     /**
-     * Draw the label that is currently active
-     * @param label
+     * Handles scrolls - when scrolling set the auto scroll to a waiting period
      */
-    function drawCurrent(label: Label) {
-        return <Grid container
-                     direction="row"
-                     justify="center"
-                     alignItems="center"
-                     className={classes.activeItem}>
-            <Grid item xs={3}><CheckIcon/></Grid>
-            <Grid item xs={9}><h5>{label.text}</h5></Grid>
-        </Grid>;
-    }
-
-    /**
-     * Draw the activated label which can be a completed or current label
-     * @param label
-     */
-    function drawActivated(label: Label) {
-        return <>
-            {props.timeline.currentLabel() === label.text ?
-                drawCompleted(label) : drawCurrent(label)
-            }
-        </>;
+    handleScroll() {
+        // last time user scrolled is 0.8s ago
+        if(this.state.lastTimeScrolled < new Date().getTime() - 800 ) { this.setState({waitPeriod: 800})
+        } else { this.setState({waitPeriod: 4000});} // else set a long wait
+        this.setState({lastTimeScrolled: Date.now()});
     }
 
 
-    /**
-     * Draw in-active label
-     * @param label
-     */
-    function drawInActive(label: Label) {
-        return <Grid container
-                     direction="row"
-                     justify="center"
-                     alignItems="center"
-                     className={classes.item}>
-            <Grid item xs={3}><HourglassEmptyIcon/></Grid>
-            <Grid item xs={9}><h5>{label.text}</h5></Grid>
-        </Grid>;
-    }
-
-    /**
-     * Draw a list of completed, current, inactive labels
-     */
-    function drawerList() {
-        return (
-            labels.map((label, index) => (
-                    <React.Fragment key={index}>
-                        {props.progress > label.progress?
-                            <button className={classes.itemButton} onClick={() => handleListItem(label)}>
-                                {drawActivated(label)}
-                            </button>:
-                            <button
-                                className={classes.itemButton}
-                                onClick={() => handleListItem(label)}>
-                                {drawInActive(label)}
-                            </button>
-                        }
-                    </React.Fragment>
-                ))
-        )
-    }
-
+    // =============== Drawable components
     /**
      * Draw the app bar's tools
      */
-    function drawToolbar() {
+    drawToolbar() {
+        const {classes} = this.props;
         return <Toolbar
-            className={classes.toolbar}
-            id='back-to-top-anchor'>
+                className={classes.toolbar}
+        >
             <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                className={clsx(classes.menuButton, open && classes.hide)}
+                color={"inherit"}
+                aria-label="open drawer right"
+                edge={"start"}
+                onClick={this.handleDrawerLeftOpen}
+                className={clsx(classes.menuButton, this.state.leftOpen && classes.hide, this.state.rightOpen && classes.hideTitle)}
             >
                 <MenuIcon/>
             </IconButton>
-            <Typography className={clsx(classes.title, open && classes.hideTitle)} variant="subtitle1"
-                        aria-label="dressage step">{props.timeline.currentLabel()}</Typography>
-        </Toolbar>;
-    }
+            <Typography
+                className={clsx(classes.title, (this.state.leftOpen || this.state.rightOpen) && classes.hideTitle)}
+                variant={"subtitle1"}
+                aria-label="current dressage step">
+                {this.state.title}
+            </Typography>
 
-    /**
-     * Draw the back button
-     */
-    function drawBackButton() {
-        return <div className={classes.backContainer}>
             <IconButton
-                className={classes.backButton}
-                onClick={handleDrawerClose}
-                aria-label="close drawer"
+                color={"inherit"}
+                aria-label="open drawer right"
+                edge={"end"}
+                onClick={this.handleDrawerRightOpen}
+                className={clsx(classes.menuButton, this.state.rightOpen && classes.hide, this.state.leftOpen && classes.hideTitle)}
             >
-                <ChevronLeftIcon/>
-                <ListItemText className={classes.backText} primary={"Back"}/>
+                <SettingsIcon/>
             </IconButton>
-        </div>;
+        </Toolbar>
     }
 
-    return (
-        <div className={classes.root}>
-            <AppBar
-                className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
-                })}>
-                {drawToolbar()}
-            </AppBar>
+    render() {
+        const {classes} = this.props;
+        return (
+            <div  className={classes.root}>
+                <AppBar
+                    className={clsx(classes.appBar, {
+                        [classes.appBarShift]: this.state.leftOpen,
+                        [classes.appBarShiftRight]: this.state.rightOpen,
+                    })}
+                >
+                    {this.drawToolbar()}
+                </AppBar>
 
-            <Drawer
-                className={classes.drawer}
-                variant="persistent"
-                anchor="left"
-                open={open}
-                classes={{
-                    paper: classes.paper,
-                }}>
-                {drawBackButton()}
-                <Divider className={classes.divider}/>
-                {drawerList()}
-            </Drawer>
-        </div>
-    );
-};
+                {this.state.leftOpen &&
+                <DrawerLeft progress={this.state.progress}
+                            horseManager={this.props.horseManager}
+                            timeline={this.props.timeline}
+                            title={this.state.title}
+                            open={this.state.leftOpen}
+                            handleDrawerClose={this.handleDrawerLeftClose}
+                />}
 
-/*
+                {this.state.rightOpen &&
+                    <DrawerRight classes={classes}
+                                 open={this.state.rightOpen}
+                                 currentSheet={this.props.currentSheet}
+                                 dressageSheets={this.props.dressageSheets}
+                                 handleDrawerClose={this.handleDrawerRightClose}
+                                 changeDressageFunction={this.reloadNavBar}
+                                 handleResetView={this.props.handleResetView}
+                    />
+                }
+            </div>
+        )
+    }
+}
 
-            <ScrollToTopZoom {...props}>
-                <Fab color="secondary" size="small" aria-label="scroll back to top">
-                    <KeyboardArrowUpIcon />
-                </Fab>
-            </ScrollToTopZoom>
- */
+export default withStyles(NavBarStyles)(NavBar);

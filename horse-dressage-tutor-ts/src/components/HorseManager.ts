@@ -13,7 +13,8 @@ class HorseManager {
 
     horse: Object3D;
     mixer: AnimationMixer;
-    horseGLTF: GLTF;
+    horseView: Object3D;
+    private horseGLTF: GLTF;
 
     private idleAction: AnimationAction;
     private walkAction: AnimationAction;
@@ -44,6 +45,11 @@ class HorseManager {
         const group = new THREE.Group();
         group.add(horse);
         group.position.set(START.x, START.y, START.z);
+
+        // set up the position at where the camera would stare at the horse
+        this.horseView = new THREE.Object3D();
+        this.horseView.position.set(0, 15, 15);
+        group.add(this.horseView);
 
         // add to the scene
         this.horse = group;
@@ -136,6 +142,11 @@ class HorseManager {
      */
     pauseMixer() {
         this.mixer.timeScale = 0;
+    }
+
+    resetHorsePosition() {
+        this.activateAllActions();
+        this.horse.position.set(START.x, START.y, START.z);
     }
 
 }

@@ -12,10 +12,10 @@ import {CSSPlugin} from 'gsap/CSSPlugin';
 import {DressageTest, Point, Step, Steps, Test} from "./types";
 import {
     DURATIONS,
-    FINAL_STEP,
+    FINAL_STEP, LEFT_COLUMN_LETTERS,
     LETTERS,
     MAX_Y_AXIS,
-    MIN_Y_AXIS,
+    MIN_Y_AXIS, RIGHT_COLUMN_LETTERS,
     START
 } from "./Constants";
 import Vector from "./Vector";
@@ -25,8 +25,8 @@ gsap.registerPlugin(MotionPathPlugin);
 gsap.registerPlugin(CSSPlugin);
 
 class DressageTimeline {
-    private readonly masterTimeline: GSAPTimeline;
-    private readonly lifecyclePoint: Point;
+    private masterTimeline: GSAPTimeline;
+    private lifecyclePoint: Point;
     private latestPositionVector: THREE.Vector3;
     private count: number;
     private currStep: Step;
@@ -89,6 +89,10 @@ class DressageTimeline {
                             this.masterTimeline.add(this.turnRight(false, []));
                             break;
                         }
+                        case "Right-Midpoint": {
+                            this.masterTimeline.add(this.turnRight(true, []));
+                            break;
+                        }
                         case "Curvy-Straight": {
                             this.masterTimeline.add(this.lineCurve());
                             break;
@@ -97,12 +101,36 @@ class DressageTimeline {
                             this.masterTimeline.add(this.serpentine(2, true));
                             break;
                         }
+                        case "Half-Circle-Left-10": {
+                            this.masterTimeline.add(this.halfCircle(10, true));
+                            break;
+                        }
+                        case "Half-Circle-Right-10": {
+                            this.masterTimeline.add(this.halfCircle(10, false));
+                            break;
+                        }
+                        case "Half-Circle-Right-15": {
+                            this.masterTimeline.add(this.halfCircle(15, false));
+                            break;
+                        }
+                        case "Half-Circle-Left-15": {
+                            this.masterTimeline.add(this.halfCircle(15, true));
+                            break;
+                        }
+                        case "Half-Circle-Left-20": {
+                            this.masterTimeline.add(this.halfCircle(20, true));
+                            break;
+                        }
+                        case "Half-Circle-Right-20": {
+                            this.masterTimeline.add(this.halfCircle(20, false));
+                            break;
+                        }
                         case "Exit": {
                             this.masterTimeline.add(this.exit());
                             break;
                         }
                         default: {
-                            console.log("Action case does not exist!");
+                            console.log("Action case does not exist! - ", this.currStep.action);
                             break;
                         }
                     }
@@ -181,9 +209,8 @@ class DressageTimeline {
 
         if (points.length === 0) { points.addStepsToPoint(this.currStep);} // setup points array if it is empty
 
-        if(this.currStep && makeMidpoint) { // make a midpoint (to carry out 2 short turns) and insert it after the first point.
-            points.splice(1, 0, {x: points[0].x, y: (points[points.length - 1].y + points[0].y)/2});
-        }
+        this.constructAnchorPoints(makeMidpoint, points);
+
 
         for(let i = 0; i < points.length - 1; i++) { // number of turning operation
             let bezPoints = points.setupBezPoints(i, this.latestPositionVector);
@@ -191,9 +218,7 @@ class DressageTimeline {
             let directionalVector = new THREE.Vector3().subVectors(new THREE.Vector3(points[i+1].x, points[i+1].y, 0), this.latestPositionVector).normalize();
 
             // Adjust bezPoints based on direction
-            if (directionalVector.x < 0 && directionalVector.y < 0 && makeMidpoint) { // left down (special condition w/ step)
-                bezPoints[1] =  bezPoints[2] = {x: points[i].x, y: points[i].y};
-            } else if ((directionalVector.x > 0 && directionalVector.y < 0) || (directionalVector.x < 0 && directionalVector.y > 0)) { // Moving - Right Down || Left Up
+            if ((directionalVector.x > 0 && directionalVector.y < 0) || (directionalVector.x < 0 && directionalVector.y > 0)) { // Moving - Right Down || Left Up
                 bezPoints[1] = bezPoints[2] = {x: points[i].x, y: points[i + 1].y};
             } else if ((directionalVector.x < 0 && directionalVector.y < 0) || (directionalVector.x > 0 && directionalVector.y > 0)) { // Moving - Left Down || Right Up
                 bezPoints[1] = bezPoints[2] = {x: points[i+1].x, y: points[i].y};
@@ -201,7 +226,6 @@ class DressageTimeline {
 
             this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0);
         } // end of for loop...
-
         return timeline;
     }
 
@@ -213,6 +237,7 @@ class DressageTimeline {
     private turnRight(makeMidpoint: boolean, points?: Point[]): GSAPTimeline {
         const timeline = gsap.timeline();
         if (points.length === 0) {points.addStepsToPoint(this.currStep);} // setup points for the current step if empty
+        this.constructAnchorPoints(makeMidpoint, points);
 
         for(let i = 0; i < points.length - 1; i++) { // number of turning operation
             let bezPoints = points.setupBezPoints(i, this.latestPositionVector);
@@ -229,6 +254,23 @@ class DressageTimeline {
             this.bezierCurvedTimeline(bezPoints, timeline, directionalVector.y > 0);
         }
         return timeline;
+    }
+
+    private constructAnchorPoints(makeMidpoint: boolean, points: Point[]) {
+        if (this.currStep && makeMidpoint) { // make a midpoint (to carry out 2 short turns) and insert it after the first point.
+            let midPointXAddition = 0;
+
+            if (this.currStep.position[0] in LEFT_COLUMN_LETTERS) {
+                midPointXAddition = -4.2;
+            } else if (this.currStep.position[0] in RIGHT_COLUMN_LETTERS) {
+                midPointXAddition = 4.2;
+            }
+
+            points.splice(1, 0, {
+                x: points[0].x + midPointXAddition,
+                y: (points[points.length - 1].y + points[0].y) / 2
+            });
+        }
     }
 
     /**
@@ -274,6 +316,55 @@ class DressageTimeline {
         return timeline;
     }
 
+    private halfCircle(size: number, isLeft: boolean): GSAPTimeline {
+        const timeline = gsap.timeline();
+
+        // setup array of points
+        let points = [];
+        points.addStepsToPoint(this.currStep);
+
+        let directionalVector = new THREE.Vector3().subVectors(new THREE.Vector3(points[points.length - 1].x, points[points.length - 1].y, 0), this.latestPositionVector).normalize();
+
+        if(directionalVector.x === 0) {
+            if(directionalVector.y < 0) { // moving down else moving up
+                size = -size;
+            }
+            // create control points based on horse movement direction
+            if(isLeft) {
+                // Add 2 more control points
+                points.splice(1, 0, {x: points[0].x + size * (2/3), y: points[0].y}); // 1st control point
+                points.splice(2, 0, {x: points[points.length - 1].x + size * (2/3), y: points[points.length - 1].y}); // 2nd control point
+            } else {
+                // Add 2 more control points
+                points.splice(1, 0, {x: points[0].x - size * (2/3), y: points[0].y}); // 1st control point
+                points.splice(2, 0, {x: points[points.length - 1].x - size * (2/3), y: points[points.length - 1].y}); // 2nd control point
+            }
+
+            this.bezierCurvedTimeline(points, timeline, directionalVector.y > 0);
+
+
+        } else { // if circling horizontally
+            if(directionalVector.x > 0) { // moving down else moving up
+                size = -size;
+            }
+
+            if(isLeft) {
+                // Add 2 more control points
+                points.splice(1, 0, {x: points[0].x , y: points[0].y + size * (21/40)}); // 1st control point
+                points.splice(2, 0, {x: points[points.length - 1].x , y: points[points.length - 1].y + size * (21/40)}); // 2nd control point
+            } else {
+                // Add 2 more control points
+                points.splice(1, 0, {x: points[0].x, y: points[0].y  - size * (21/40)}); // 1st control point
+                points.splice(2, 0, {x: points[points.length - 1].x , y: points[points.length - 1].y - size * (21/40)}); // 2nd control point
+            }
+
+            let lateralVector = new THREE.Vector3().subVectors(new THREE.Vector3(points[1].x, points[1].y, 0), this.latestPositionVector).normalize();
+
+            this.bezierCurvedTimeline(points, timeline, lateralVector.y > 0, true);
+        }
+        return timeline;
+    }
+
     /**
      * returns a timeline that corresponds to a horse moving in a straight line.
      * Similar to how sine wave looks when passing through the origin.
@@ -290,13 +381,13 @@ class DressageTimeline {
 
             let directionalVector = new THREE.Vector3().subVectors(new THREE.Vector3(points[i+1].x, points[i+1].y, 0), this.latestPositionVector).normalize();
 
-            if (directionalVector.x > 0 && directionalVector.y > 0) { // Right Up
+            if (directionalVector.x > 0 &&  (directionalVector.y < 0 || directionalVector.y > 0) ) { // move right - up or down
                 if (i === 0) { // Smooth curve into a straight line transition.
                     bezPoints[1] = bezPoints[2] = {x: points[i].x + 2, y: points[i].y};
                 } else {
                     bezPoints[1] = bezPoints[2] = {x: points[i + 1].x - 2, y: points[i + 1].y};
                 }
-            }  else if (directionalVector.x < 0 && directionalVector.y > 0) { // Left Up
+            }  else if (directionalVector.x < 0 && (directionalVector.y > 0|| directionalVector.y < 0) ) { // move left - up or down
                 if(i === 0) { // Smooth curve into a straight line transition.
                     bezPoints[1] = bezPoints[2] = {x: points[i].x - 2, y: points[i].y};
                 } else {
@@ -349,8 +440,9 @@ class DressageTimeline {
      * @param bezPoints : points to create a bezier curve (4 control points)
      * @param timeline : to attach the action to
      * @param isAboveCurve : horse looks at different directions depending if the current point is above or below
+     * @param isSwitch
      */
-    private bezierCurvedTimeline(bezPoints: Point[], timeline: GSAPTimeline, isAboveCurve: boolean) {
+    private bezierCurvedTimeline(bezPoints: Point[], timeline: GSAPTimeline, isAboveCurve: boolean, isSwitch?: boolean) {
         const cubicBezierCurve: CubicBezierCurve3 = bezPoints.convertBezPointsToBezCurve();
         const gait = this.currStep.gait;
         const type = this.currStep.type;
@@ -360,6 +452,11 @@ class DressageTimeline {
 
         let directionAngle = (90) * Math.PI/180; // direction based on below the curve
         if (isAboveCurve) { directionAngle = -directionAngle;}
+        let changeXDirection;
+        let originalAngle = directionAngle.valueOf();
+        if (isSwitch) {
+            changeXDirection = isSwitch;
+        }
 
         // create a timeline that updates as horse moves along the curve
         timeline.to(this.lifecyclePoint,{ease:"none", duration: additionalDuration, onUpdate: ()=> {
@@ -369,6 +466,12 @@ class DressageTimeline {
                 // future tick for the next update
                 let tick = ((timeline.time() * 60) - (currTimelineTotalDuration * 60))/ (additionalDuration * 60); // look ahead tick
                 if (tick > 1) { tick = 1; }
+
+                if(changeXDirection && tick >= 0.5){
+                    directionAngle = -originalAngle;
+                } else if(changeXDirection && tick <= 0.5) {
+                    directionAngle = originalAngle;
+                }
 
                 // Rotation in the z-axis
                 this.horseManager.updateZRotation(cubicBezierCurve, tick, directionAngle);
@@ -421,6 +524,20 @@ class DressageTimeline {
 
     public getTimeline(): GSAPTimeline {
         return this.masterTimeline
+    }
+
+    public setDatasetForTimeline(data: DressageTest) {
+        // starting position of the horse (always)
+        this.lifecyclePoint = {x: START.x, y: START.y};
+        this.latestPositionVector = new THREE.Vector3(START.x, START.y, START.z);
+        this.count = 0;
+        this.currStep = null;
+
+
+
+        this.masterTimeline = gsap.timeline({paused: true});
+        this.buildTimeline(data);
+        console.log(this.horseManager.horse.position);
     }
 }
 

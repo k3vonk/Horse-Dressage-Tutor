@@ -20,7 +20,8 @@ class SceneManager {
     private readonly camera: THREE.PerspectiveCamera;
     private readonly orbitControls: OrbitControls;
     private animationSpeed = 0.005;
-    private animationFrameID?: number;
+    private isViewingScene = true;
+    animationFrameID?: number;
     private prevTime = Date.now();
 
     scene: THREE.Scene;
@@ -38,6 +39,9 @@ class SceneManager {
         // Add Subjects to Scene
         this.scene.add(this.camera);
         this.createStaticSceneSubjects();
+
+        // bind this
+        this.animate = this.animate.bind(this);
     }
 
     /**
@@ -81,6 +85,7 @@ class SceneManager {
         const initialCameraPositionX = Math.tan(camera.rotation.y)*Math.sqrt(zDistance**2 + initialCameraPositionY**2);
         camera.position.set(initialCameraPositionX, initialCameraPositionY, zDistance);
         camera.up.set( 0, 0, 1 );
+        camera.lookAt(this.scene.position);
         return camera;
     }
 
@@ -137,20 +142,53 @@ class SceneManager {
     }
 
     /**
-     * Public render function that renders the scene on callbacks
+     * camera view is adjusted to view the horse or the scene's origin
      */
-    render(): void {
-        // Render & Update subjects if necessary
-        this.renderer.render(this.scene, this.camera);
-        this.orbitControls.update();
-        this.animationFrameID = requestAnimationFrame(this.render.bind(this)); // call back to get ID
+    private cameraView() {
 
-        if(this.horseManager.mixer) {
+        if(this.isViewingScene) {
+            this.orbitControls.enabled = true;
+            this.camera.lookAt(this.scene.position);
+        } else {
+            this.orbitControls.enabled = false; // disable controls because camera is constantly being adjusted therefore, conflicts occur
+
+            // get the horse view and set its matrix position
+            const horseView = this.horseManager.horseView;
+            const relativeCameraOffset = new THREE.Vector3();
+            relativeCameraOffset.setFromMatrixPosition(horseView.matrixWorld);
+
+            // lerp to the camera offset while looking at the horse
+            this.camera.position.lerp(relativeCameraOffset, 0.2);
+            this.camera.lookAt(this.horseManager.horse.position);
+        }
+    }
+
+    /**
+     * render the canvas with its scenery
+     */
+    private render() {
+
+        this.orbitControls.update();
+        this.cameraView();
+
+        if(this.horseManager) {
             const time = Date.now();
             this.horseManager.mixer.update(( time - this.prevTime ) * this.animationSpeed);
             this.prevTime = time;
         }
+
+        this.renderer.render(this.scene, this.camera);
     }
+
+    /**
+     * Animation frame
+     */
+    animate(): void {
+        // Render & Update subjects if necessary
+        this.animationFrameID =  requestAnimationFrame( this.animate ); // call back to get ID
+        this.render();
+    }
+
 
     /**
      * Callback event that changes the camera view and the size of the renderering
@@ -158,10 +196,9 @@ class SceneManager {
      */
     onWindowResize(): void {
         const {width, height} = this.canvas;
-
+        this.resetCameraOrientation();
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
-
         this.renderer.setSize(width, height); // adjust size of rendering screen
     }
 
@@ -182,6 +219,18 @@ class SceneManager {
         return this.horseManager;
     }
 
+    resetCameraOrientation() {
+        this.isViewingScene = true;
+        this.orbitControls.reset();
+    }
+
+    toggleIsViewingScene() {
+        this.isViewingScene = !this.isViewingScene;
+
+        if(this.isViewingScene)
+            this.resetCameraOrientation();
+    }
+    
 }
 
 export default SceneManager;

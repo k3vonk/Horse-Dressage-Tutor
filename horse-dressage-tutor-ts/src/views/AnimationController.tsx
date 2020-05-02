@@ -1,11 +1,5 @@
-/**
- * Animation Controller : A React Functional Component that displays a player, and the title of the dressage sheet
- * 
- * @author: Ga Jun Young
- */
-
-import React, {useEffect, useState} from 'react';
-import {Mark} from "@material-ui/core";
+import React from 'react';
+import {Icon, Mark, withStyles, WithStyles} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import ReplayIcon from "@material-ui/icons/Replay";
@@ -15,112 +9,182 @@ import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
 import CustomSlider from "../css/MakeStyles/CustomSlider";
 import AnimationControllerStyles from "../css/MakeStyles/AnimationControllerStyle";
-import DressageTimeline from "../utils/DressageTimeline";
 import HorseManager from "../components/HorseManager";
-import {NavBar} from "./NavBar";
+import clsx from "clsx";
+/**
+ * Animation Controller : A React Pure Component that displays the animation player, and the title of the dressage sheet
+ * 
+ * @author: Ga Jun Young
+ */
 
 /**
  * Prop Interface for this Functional Component
  */
-interface AnimationProps {
-    dressageTimeline: DressageTimeline,
+interface AnimationProps extends WithStyles<typeof AnimationControllerStyles>{
+    timeline: GSAPTimeline,
     horseManager: HorseManager,
-    title: string
+    title: string,
+    resetOrientation: () => void
 }
 
-export const AnimationController: React.FC<AnimationProps> = (props) => {
-    const [timeline] = useState<GSAPTimeline>(props.dressageTimeline.getTimeline());
-    const [isDraggablePaused, setIsDraggablePaused] = useState<boolean>(false);
-    const [isReplay, setIsReplay] = useState<boolean>(false);
-    const [sliderValue, setSliderValue] = useState<number>(0);
-    const [marks, setMarks] = useState<Mark[]>([]); // setup marks for the slider
-    const [, setTime] = useState(Date.now());
-    const classes = AnimationControllerStyles();
+interface AnimationState {
+    isDraggablePaused: boolean,
+    isReplay: boolean,
+    toggle: boolean,
+    sliderValue: number,
+    totalTime: string,
+    currentTime: string,
+    marks: Mark[],
+}
 
-    // setup timeline callback - onUpdate
-    useEffect(() => {
-        timeline.play(); // play timeline...
-        setIsDraggablePaused(false);
+class Buttons extends React.Component<{ classes: any, onClick: () => void, actionIcon: any, onClick1: () => void, onClick2: () => void, toggle: boolean, onClick3: () => void }> {
+    render() {
+        return <>
+            <IconButton className={this.props.classes.iconButton} aria-label="play-pause-replay"
+                        onClick={this.props.onClick}>
+                {this.props.actionIcon}
+            </IconButton>
+            <IconButton className={this.props.classes.iconButton} aria-label="skipPrev" onClick={this.props.onClick1}>
+                <SkipPreviousIcon/>
+            </IconButton>
+            <IconButton className={this.props.classes.iconButton} aria-label="skipNext" onClick={this.props.onClick2}>
+                <SkipNextIcon/>
+            </IconButton>
+            <IconButton className={clsx(this.props.classes.iconButton, {
+                [this.props.classes.activeIconButton]: this.props.toggle,
+            })} aria-label="resetView" onClick={this.props.onClick3}>
+                <Icon>
+                    <svg className={this.props.classes.svg} aria-hidden="true" focusable="false" data-prefix="fas"
+                         data-icon="horse-head"
+                         role="img" xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 10 512 512">
+                        <path fill="currentColor"
+                              d="M509.8 332.5l-69.9-164.3c-14.9-41.2-50.4-71-93-79.2 18-10.6 46.3-35.9 34.2-82.3-1.3-5-7.1-7.9-12-6.1L166.9 76.3C35.9 123.4 0 238.9 0 398.8V480c0 17.7 14.3 32 32 32h236.2c23.8 0 39.3-25 28.6-46.3L256 384v-.7c-45.6-3.5-84.6-30.7-104.3-69.6-1.6-3.1-.9-6.9 1.6-9.3l12.1-12.1c3.9-3.9 10.6-2.7 12.9 2.4 14.8 33.7 48.2 57.4 87.4 57.4 17.2 0 33-5.1 46.8-13.2l46 63.9c6 8.4 15.7 13.3 26 13.3h50.3c8.5 0 16.6-3.4 22.6-9.4l45.3-39.8c8.9-9.1 11.7-22.6 7.1-34.4zM328 224c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24z"/>
+                    </svg>
+                </Icon>
+            </IconButton>
+        </>;
+    }
+}
 
-    },[props.dressageTimeline, timeline]);
+class AnimationController extends React.PureComponent<AnimationProps, AnimationState> {
 
-    useEffect(()=> {
-        const interval = setInterval(() => {
-                setTime(Date.now());
-                setSliderValue(timeline.progress() * timeline.totalDuration());
-                if (timeline.progress() === 1) { setIsReplay(true); }
-                else { setIsReplay(false);}
-                },
-            800
-        );
-        return() => {
-            clearInterval(interval);
+    private interval;
+    constructor(props: AnimationProps) {
+        super(props);
+
+        this.state = {
+            isDraggablePaused: false,
+            isReplay: false,
+            toggle: false,
+            sliderValue: 0,
+            totalTime: '00:00',
+            currentTime: '00:00',
+            marks: [],
+        };
+
+        // binding to enable 'this' to work in callbacks
+        this.tick = this.tick.bind(this);
+        this.onPlayButtonClick = this.onPlayButtonClick.bind(this);
+        this.onSliderChange = this.onSliderChange.bind(this);
+        this.onSliderCommitted = this.onSliderCommitted.bind(this);
+        this.onSkipPrevClick = this.onSkipPrevClick.bind(this);
+        this.onSkipNextClick = this.onSkipNextClick.bind(this);
+        this.handleHorseViewClick = this.handleHorseViewClick.bind(this);
+    }
+
+    componentDidMount(): void {
+        this.setState({
+            totalTime: this.timeConvert(this.props.timeline.totalDuration()),
+            currentTime: this.timeConvert(this.props.timeline.time())
+        });
+        this.props.timeline.play();
+        this.generateMarks();
+        this.interval = setInterval(() => this.tick(), 1000);
+    }
+
+    componentDidUpdate(prevProps: Readonly<AnimationProps>, prevState: Readonly<AnimationState>, snapshot?: any): void {
+        if(prevProps.timeline !== this.props.timeline) {
+            this.setState({
+                isDraggablePaused: false,
+                isReplay: true,
+                toggle: false,
+                sliderValue: 0,
+                totalTime: this.timeConvert(this.props.timeline.totalDuration()),
+                currentTime: this.timeConvert(this.props.timeline.time()),
+                marks: [],
+            });
+
+            this.generateMarks();
+            this.tick();
         }
-    }, [timeline]);
+    }
 
-    // setup marks on the slider
-    useEffect(()=> {
-        generateMarks();
-    });
+    componentWillUnmount(): void {
+        clearInterval(this.interval);
+    }
 
     /**
      * generate marks for the slider
      */
-    const generateMarks = function() {
-        if (marks.length === 0) {
-            let marks: Mark[] = [];
+    generateMarks() {
+        let marks: Mark[] = [];
+        // Iterate through the timeline labels...
+        for (let [key, value] of Object.entries(this.props.timeline.labels)) {
+            let label = "";
 
-            // Iterate through the timeline labels...
-            for (let [key, value] of Object.entries(timeline.labels)) {
-                let label = "";
-
-                // extract the test number from the key
-                if(!isNaN(parseInt(key.substr(0,key.indexOf(' '))))){
-                    label = key.substr(0,key.indexOf(' '));
-                }
-
-                // Add a mark
-                marks.push({
-                    value: value,
-                    label: label,
-                })
+            // extract the test number from the key
+            if(!isNaN(parseInt(key.substr(0,key.indexOf(' '))))){
+                label = key.substr(0,key.indexOf(' '));
             }
-            setMarks(marks);
+
+            // Add a mark
+            marks.push({
+                value: value,
+                label: label,
+            })
         }
+
+        this.setState({marks: marks});
     };
 
     /**
      * Time conversion of the timeline to minutes:seconds
      * @param time
      */
-    const timeConvert = function(time: number): String {
+    timeConvert(time: number): string {
         const date = new Date(time * 1000);
         const minutes = date.getUTCMinutes();
         const seconds = date.getSeconds();
         return minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
     };
 
-    // ==================   Display functions   ==================
+    // ==================   Callback functions   ==================
     /**
-     * Display pause or play button depending on the timeline
+     * ticker to update a component
      */
-    const visualIconOnActive = function() {
-        if (timeline.isActive()) {
-            return  <PauseIcon/>
+    tick() {
+        this.setState({
+            sliderValue: (this.props.timeline.progress() * this.props.timeline.totalDuration()),
+            currentTime: this.timeConvert(this.props.timeline.time())
+        });
+
+        if (this.props.timeline.progress() !== 1) {
+            this.setState({isReplay: false,});
+        } else {
+            this.setState({isReplay: true,})
         }
-        return <PlayArrowIcon/>
     };
 
-    // ==================   Callback functions   ==================
     /**
      * When slider is pressed, pause the progress of the timeline
      * @param object : not used.
      * @param value
      */
-    const onSliderChange = function(object, value: number) {
-        setSliderValue(value);
-        timeline.progress(value / timeline.totalDuration());
-        timeline.pause();
+    onSliderChange(object, value: number) {
+        this.setState({sliderValue: value});
+        this.props.timeline.progress(value / this.props.timeline.totalDuration());
+        this.props.timeline.pause();
     };
 
     /**
@@ -128,127 +192,116 @@ export const AnimationController: React.FC<AnimationProps> = (props) => {
      * @param object : not used.
      * @param value
      */
-    const onSliderCommitted = function(object, value: number) {
-        setSliderValue(value);
-        props.horseManager.pauseMixer(); // pause the horses animation
-        if (!isDraggablePaused) // if the video was originally being played...
-            timeline.play();
+    onSliderCommitted(object, value: number) {
+        this.setState({sliderValue: value});
+        this.props.horseManager.pauseMixer(); // pause the horses animation
+
+        if(!this.state.isDraggablePaused) // if the video was originally paused...
+            this.props.timeline.play();
     };
 
     /**
      * Depending on the play buttons current state,
      * The clicking of the button would either play or pause.
      */
-    const onPlayButtonClick = function() {
-        if(!isReplay) { // if replay is not available...
-            if (!timeline.isActive()) { // timeline is not active... play timeline
-                timeline.play();
-                setIsDraggablePaused(false);
+    onPlayButtonClick() {
+        if(!this.state.isReplay) { // if replay is not available...
+            if (!this.props.timeline.isActive()) { // timeline is not active... play timeline
+                this.props.timeline.play();
+                this.setState({isDraggablePaused: false});
             } else { // else pause timeline...
-                timeline.pause();
-                props.horseManager.pauseMixer();
-                setIsDraggablePaused(true);
+                this.props.timeline.pause();
+                this.props.horseManager.pauseMixer();
+                this.setState({isDraggablePaused: true});
             }
         } else {
-            timeline.progress(0); // restart
+            this.props.timeline.progress(0); // restart
+        }
+    }
+
+    /**
+     * On click, seek the previous timeline label and skip to that label
+     */
+    onSkipPrevClick() {
+        if(this.props.timeline.progress() !== 0) { // disallow skipping backwards when progress is 0.
+            let prevLabel = this.props.timeline.previousLabel();
+            // @ts-ignore
+            this.props.timeline.seek(prevLabel, false); // Gsap typescript definition and Gsap documents are currently different. But overload functionality is possible
         }
     };
 
     /**
      * On click, seek the next timeline label and skip to that label
      */
-    const onSkipNextClick = function() {
-        let nextLabel = timeline.nextLabel();
+    onSkipNextClick() {
+        let nextLabel = this.props.timeline.nextLabel();
         // @ts-ignore
-        timeline.seek(nextLabel,false); // Gsap typescript definition and Gsap documents are currently different. But overload functionality is possible
+        this.props.timeline.seek(nextLabel,false); // Gsap typescript definition and Gsap documents are currently different. But overload functionality is possible
     };
 
     /**
-     * On click, seek the previous timeline label and skip to that label
+     * call back to handle the toggling of the horse view button
      */
-    const onSkipPrevClick = function() {
-        if(timeline.progress() !== 0) { // disallow skipping backwards when progress is 0.
-            let prevLabel = timeline.previousLabel();
-            // @ts-ignore
-            timeline.seek(prevLabel, false); // Gsap typescript definition and Gsap documents are currently different. But overload functionality is possible
-        }
+    handleHorseViewClick() {
+        this.props.resetOrientation();
+        this.setState({toggle: !this.state.toggle})
     };
 
+    // ========================= Draw components
+
     /**
-     * Draw the buttons for the controller - play, skip prev, skip next
+     * Return the appropriate action icon depending on the status of the timeline bar
      */
-    function drawControllerButtons() {
-        return <>
-            <IconButton className={classes.iconButton} aria-label="play-pause-replay" onClick={onPlayButtonClick}>
-                {isReplay ? <ReplayIcon/> : visualIconOnActive()}
-            </IconButton>
-            <IconButton className={classes.iconButton} aria-label="skipNext" onClick={onSkipPrevClick}>
-                <SkipPreviousIcon/>
-            </IconButton>
-            <IconButton className={classes.iconButton} aria-label="skipNext" onClick={onSkipNextClick}>
-                <SkipNextIcon/>
-            </IconButton>
-        </>;
+    actionIcon() {
+        if(this.state.isReplay)
+            return <ReplayIcon/>;
+
+        if(this.props.timeline.isActive())
+            return <PauseIcon/>;
+
+        return <PlayArrowIcon/>;
     }
 
-    return (
-        <React.Fragment>
-            <NavBar timeline={timeline} progress={sliderValue} horseManager={props.horseManager}/>
-
+    render() {
+        const {classes} = this.props;
+        return (
             <div className={classes.root}>
-                <Grid
-                    container
-                    direction="row"
-                    justify="center"
-                    alignItems="center"
-                >
-
+                <Grid container justify="center">
                     <Grid item xs={11}>
                         <CustomSlider
-                            min={0.0}
-                            max={timeline.totalDuration()}
-                            value={sliderValue}
-                            marks={marks}
-                            onChange={onSliderChange}
-                            onChangeCommitted={onSliderCommitted}
+                            min={0}
+                            max={this.props.timeline.totalDuration()}
+                            value={this.state.sliderValue}
+                            marks={this.state.marks}
+                            onChange={this.onSliderChange}
+                            onChangeCommitted={this.onSliderCommitted}
                             aria-label="continuous-slider"
                         />
                     </Grid>
-
                 </Grid>
 
-                <Grid container
-                      direction="row"
-                      justify="center"
-                      alignItems="center"
-                >
+                <Grid container justify="center">
                     <Grid item xs={5}>
                         <Grid container alignItems="center">
-                            <Grid item >
-                                {drawControllerButtons()}
-                            </Grid>
-
                             <Grid item>
-                                <p className={classes.time}>{timeConvert(timeline.time()) + " / " + timeConvert(timeline.totalDuration())}</p>
+                                <Buttons classes={classes} onClick={this.onPlayButtonClick}
+                                         actionIcon={this.actionIcon()} onClick1={this.onSkipPrevClick}
+                                         onClick2={this.onSkipNextClick} toggle={this.state.toggle}
+                                         onClick3={this.handleHorseViewClick}/>
+                            </Grid>
+                            <Grid item>
+                                <p className={classes.time}>{this.state.currentTime + " / " + this.state.totalTime}</p>
                             </Grid>
                         </Grid>
                     </Grid>
 
                     <Grid item xs={6}>
-                        <p className={classes.dressageName}>{props.title}</p>
+                        <p className={classes.dressageName}>{this.props.title}</p>
                     </Grid>
-
                 </Grid>
-
-
             </div>
+        )
+    }
+}
 
-        </React.Fragment>
-    )
-};
-
-/*
-
-            <NavBar timeline={timeline} progress={sliderValue} horseManager={props.horseManager}/>
-
- */
+export default withStyles(AnimationControllerStyles)(AnimationController);
