@@ -1,3 +1,8 @@
+/**
+ * Storage of constant values
+ *
+ * @author: Ga Jun Young, 16440714
+ */
 import {
     CameraOptions,
     CenterLetters,
@@ -5,10 +10,11 @@ import {
     EdgeLetters,
     FenceOptions,
     GridOptions,
-    LetterStyle, Step
+    LetterStyle,
+    Step
 } from "./types";
 import * as THREE from 'three';
-import {Vector3} from "three";
+import {Vector3} from 'three';
 
 export const defaultGridOptions: GridOptions = {
     size: 40,
@@ -75,7 +81,7 @@ export const ADJUST_Z_DISTANCE = {
     LARGE: 60,
     MEDIUM: 15,
     SMALL: 10,
-}
+};
 
 export const MAX_Y_AXIS: number = 7;
 export const MIN_Y_AXIS: number = -7;
@@ -161,3 +167,9 @@ export const TYPE = {
     "Medium Strides": 0.8,
     "Extended": 0.8
 };
+
+export const DRESSAGE_SHEET_FILEPATHS = ["./sample/novice_dressage_110_2012.json",
+    "./sample/ipc_novice_dressage_championship_2017.json",
+    "./sample/airc_novice_dressage_22_2020.json"];
+
+export const NAVBAR_HEIGHT = '10vh';

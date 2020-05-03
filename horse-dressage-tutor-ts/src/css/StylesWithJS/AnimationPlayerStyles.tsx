@@ -1,12 +1,12 @@
 /**
- * Creates the CSS styles for the AnimationController page
+ * Creates the CSS-IN-JS styles for the AnimationPlayer component
  *
- * @author: Ga Jun Young
+ * @author: Ga Jun Young, 16440714
  */
 
 import {createStyles} from "@material-ui/core";
 
-const AnimationControllerStyles = () => createStyles({
+const AnimationPlayerStyles = () => createStyles({
         root: {
             position: 'absolute',
             width: '100%',
@@ -65,8 +65,23 @@ const AnimationControllerStyles = () => createStyles({
                 padding: 12,
             }
         },
-        activeIconButton: {
-            color: 'rgba(255,255,255,1)',
+        activeHorseIcon: {
+            color: 'rgba(255,255,255,1) !important',
+        },
+        horseIcon: {
+            color: 'rgba(255,255,255,0.6)',
+            border: '2px solid transparent',
+            borderRadius: 0,
+            padding: 0,
+            '&:hover': {
+                color: 'rgba(255,255,255,0.8)',
+            },
+            '@media (min-width: 500px)': {
+                padding: 0,
+            },
+            '@media (min-width: 800px)': {
+                padding: 12,
+            }
         },
         svg: {
             height: '20px',
@@ -74,4 +89,4 @@ const AnimationControllerStyles = () => createStyles({
         }
     });
 
-export default AnimationControllerStyles;
+export default AnimationPlayerStyles;

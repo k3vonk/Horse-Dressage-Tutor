@@ -4,7 +4,7 @@
  * @Author: Ga Jun Young, 16440714
  */
 import * as THREE from "three";
-import {defaultColors, defaultGridOptions} from "../utils/Constants";
+import {defaultColors, defaultGridOptions} from "../utils/defined/Constants";
 
 class Ground {
     constructor(scene: THREE.Scene) {

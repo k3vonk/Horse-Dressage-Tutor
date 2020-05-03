@@ -1,30 +1,30 @@
 /**
- * Loader Styles : creates a style for the loading page
+ * LoadingPageStyle : creates a CSS-JS style for the loading page
  *
  * @author: Ga Jun Young
  */
 
 import {makeStyles} from "@material-ui/core/styles";
-import {createStyles, Theme} from "@material-ui/core";
+import {createStyles} from "@material-ui/core";
+import {NAVBAR_HEIGHT} from "../../utils/defined/Constants";
 
-const LoaderStyles = makeStyles((theme: Theme) =>
+const LoadingPageStyle = makeStyles(() =>
     createStyles({
         root: {
             flexGrow: 1,
             width: '100%',
         },
         navBar: {
-            height: '10vh',
+            height: NAVBAR_HEIGHT,
             width: '100%',
         },
-        animationController: {
+        animationPlayer: {
             width: '100%',
-            top:'100vh',
-            transform:'translateY(-100%)',
+            bottom: '0%',
             position: 'absolute',
             height: "15vh",
         }
     })
 );
 
-export default LoaderStyles;
+export default LoadingPageStyle;

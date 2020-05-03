@@ -1,3 +1,9 @@
+/**
+ * Index script to render the contents of the App
+ *
+ * @author: Ga Jun Young, 16440714
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './css/index.css';

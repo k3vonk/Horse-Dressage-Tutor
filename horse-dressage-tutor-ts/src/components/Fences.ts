@@ -5,7 +5,7 @@
  */
 import * as THREE from 'three';
 import {BoxBufferGeometry, Vector3} from "three";
-import {defaultFenceOptions} from "../utils/Constants";
+import {defaultFenceOptions} from "../utils/defined/Constants";
 
 class Fences {
     private readonly fenceGroup: THREE.Group;

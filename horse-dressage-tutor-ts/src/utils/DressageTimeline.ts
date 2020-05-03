@@ -9,7 +9,7 @@ import {CubicBezierCurve3} from 'three';
 import {gsap} from 'gsap';
 import {MotionPathPlugin} from "gsap/MotionPathPlugin";
 import {CSSPlugin} from 'gsap/CSSPlugin';
-import {DressageTest, Point, Step, Steps, Test} from "./types";
+import {DressageTest, Point, Step, Steps, Test} from "./defined/types";
 import {
     DURATIONS,
     FINAL_STEP, LEFT_COLUMN_LETTERS,
@@ -17,15 +17,15 @@ import {
     MAX_Y_AXIS,
     MIN_Y_AXIS, RIGHT_COLUMN_LETTERS,
     START
-} from "./Constants";
-import Vector from "./Vector";
+} from "./defined/Constants";
+import Vector from "./defined/Vector";
 import HorseManager from "../components/HorseManager";
 
 gsap.registerPlugin(MotionPathPlugin);
 gsap.registerPlugin(CSSPlugin);
 
 class DressageTimeline {
-    private masterTimeline: GSAPTimeline;
+    private readonly masterTimeline: GSAPTimeline;
     private lifecyclePoint: Point;
     private latestPositionVector: THREE.Vector3;
     private count: number;
@@ -69,12 +69,11 @@ class DressageTimeline {
                             this.masterTimeline.add(this.halt());
                             break;
                         }
-                        case "Straight": {
-                            this.masterTimeline.add(this.straight(false));
-                            break;
-                        }
-                        case "Straight-End": {
-                            this.masterTimeline.add(this.straight(true));
+                        case "Straight":
+                        case "Straight-End":
+                        {
+                            const oneStepBack = this.currStep.action.includes("End");
+                            this.masterTimeline.add(this.straight(oneStepBack));
                             break;
                         }
                         case "Left": {
@@ -101,28 +100,16 @@ class DressageTimeline {
                             this.masterTimeline.add(this.serpentine(2, true));
                             break;
                         }
-                        case "Half-Circle-Left-10": {
-                            this.masterTimeline.add(this.halfCircle(10, true));
-                            break;
-                        }
-                        case "Half-Circle-Right-10": {
-                            this.masterTimeline.add(this.halfCircle(10, false));
-                            break;
-                        }
-                        case "Half-Circle-Right-15": {
-                            this.masterTimeline.add(this.halfCircle(15, false));
-                            break;
-                        }
-                        case "Half-Circle-Left-15": {
-                            this.masterTimeline.add(this.halfCircle(15, true));
-                            break;
-                        }
-                        case "Half-Circle-Left-20": {
-                            this.masterTimeline.add(this.halfCircle(20, true));
-                            break;
-                        }
-                        case "Half-Circle-Right-20": {
-                            this.masterTimeline.add(this.halfCircle(20, false));
+                        case "Half-Circle-Left-10":
+                        case "Half-Circle-Left-15":
+                        case "Half-Circle-Left-20":
+                        case "Half-Circle-Right-10":
+                        case "Half-Circle-Right-15":
+                        case "Half-Circle-Right-20":
+                        {
+                            const isLeft = this.currStep.action.includes("Left");
+                            const lastTwo = this.currStep.action.slice(-2);
+                            this.masterTimeline.add(this.halfCircle(+lastTwo, isLeft)); //+string converts to number
                             break;
                         }
                         case "Exit": {
@@ -316,6 +303,11 @@ class DressageTimeline {
         return timeline;
     }
 
+    /**
+     * Performs a half circle movement.
+     * @param size : size is in metres, which is the diameter of the cicle
+     * @param isLeft : to check if the horse is moving left
+     */
     private halfCircle(size: number, isLeft: boolean): GSAPTimeline {
         const timeline = gsap.timeline();
 
@@ -452,6 +444,8 @@ class DressageTimeline {
 
         let directionAngle = (90) * Math.PI/180; // direction based on below the curve
         if (isAboveCurve) { directionAngle = -directionAngle;}
+
+        //If switch is possible, then during the midpoints the directionAngle must change
         let changeXDirection;
         let originalAngle = directionAngle.valueOf();
         if (isSwitch) {
@@ -526,24 +520,25 @@ class DressageTimeline {
         return this.masterTimeline
     }
 
-    public setDatasetForTimeline(data: DressageTest) {
-        // starting position of the horse (always)
-        this.lifecyclePoint = {x: START.x, y: START.y};
-        this.latestPositionVector = new THREE.Vector3(START.x, START.y, START.z);
-        this.count = 0;
+    /**
+     * Clear and reset everything on the timeline
+     */
+    public clear() {
+        this.masterTimeline.clear();
+        this.lifecyclePoint = null;
+        this.latestPositionVector = null;
+        this.count = null;
         this.currStep = null;
-
-
-
-        this.masterTimeline = gsap.timeline({paused: true});
-        this.buildTimeline(data);
-        console.log(this.horseManager.horse.position);
+        this.horseManager.resetHorsePosition();
     }
+
 }
 
 export default DressageTimeline;
 
-// Extensions to Array
+// =================== EXTENSIONS TO ARRAY ============================= //
+
+
 // eslint-disable-next-line no-extend-native
 Array.prototype.addStepsToPoint = function(step?: Step){
     if (step) {

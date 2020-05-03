@@ -1,31 +1,27 @@
+/**
+ * Renders the right drawer. Contains settings, and switching of dressage sheets
+ *
+ * @author: Ga Jun Young, 16440714
+ */
+
 import React from "react";
-import {Divider, Drawer, Grid, IconButton, ListItemText, WithStyles} from "@material-ui/core";
-import NavBarStyles from "../css/MakeStyles/NavBarStyles";
+import {Divider, Drawer, Grid, IconButton, ListItemText} from "@material-ui/core";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import StreetviewIcon from '@material-ui/icons/Streetview';
-import {DressageTest} from "../utils/types";
 import clsx from "clsx";
-
-interface DrawerRightProps extends WithStyles<typeof NavBarStyles>{
-    open: boolean,
-    currentSheet: string,
-    dressageSheets: DressageTest[],
-    handleDrawerClose: () => void,
-    changeDressageFunction: (index: number) =>void,
-    handleResetView: ()=>void,
-}
+import {DrawerRightProps} from "../utils/defined/PropInterfaces";
 
 class DrawerRight extends React.PureComponent<DrawerRightProps> {
 
     /**
      * Draw the back button
      */
-    drawBackButton() {
+   private drawBackButton() {
         const {classes} = this.props;
         return <div className={classes.backContainer}>
             <IconButton
                 className={classes.backButton}
-                onClick={this.props.handleDrawerClose}
+                onClick={this.props.onDrawerClose}
                 aria-label="close drawer"
             >
                 <ChevronLeftIcon/>
@@ -35,14 +31,14 @@ class DrawerRight extends React.PureComponent<DrawerRightProps> {
     }
 
     /**
-     * Draw a list of completed, current, inactive labels
+     * Draw a list of dressage sheets. Small lists do not require memoization
      */
-    drawList() {
+    private drawList() {
         const {classes} = this.props;
         return (
            this.props.dressageSheets.map((test, index) => (
                 <div key={index} >
-                    <button className={classes.itemButton} onClick={() => this.props.changeDressageFunction(index)}>
+                    <button className={classes.itemButton} onClick={() => this.props.onChangeDressageSheet(index)}>
                         <Grid container
                               justify="center"
                               alignItems="center"
@@ -67,19 +63,23 @@ class DrawerRight extends React.PureComponent<DrawerRightProps> {
                 open={this.props.open}
                 classes={{ paper: classes.paper }}
             >
+                <div>
                 {this.drawBackButton()}
+                </div>
                 <Divider className={classes.divider}/>
                 {this.drawList()}
                 <Divider/>
-                <button className={classes.itemButton} onClick={()=>this.props.handleResetView()}>
-                    <Grid container
-                          justify="center"
-                          alignItems="center"
-                          className={classes.item}>
-                        <Grid item xs={3}><h5><StreetviewIcon/></h5></Grid>
-                        <Grid item xs={9}><h5>Reset View</h5></Grid>
-                    </Grid>
-                </button>
+                <div>
+                    <button className={classes.itemButton} onClick={()=>this.props.onResetView()}>
+                        <Grid container
+                              justify="center"
+                              alignItems="center"
+                              className={classes.item}>
+                            <Grid item xs={3}><h5><StreetviewIcon/></h5></Grid>
+                            <Grid item xs={9}><h5>Reset View</h5></Grid>
+                        </Grid>
+                    </button>
+                </div>
             </Drawer>
         )
     }

@@ -1,13 +1,13 @@
 /**
  * SceneManager class : manages all the scene components, camera, and renderer
  *
- * @author: Ga Jun Young
+ * @author: Ga Jun Young, 16440714
  */
 import * as THREE from 'three';
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import Helper from "../components/Helper";
 import Ground from "../components/Ground";
-import {ADJUST_Z_DISTANCE, BIG_DEVICE_RATIO, defaultCameraOptions, SCREEN_DECREASE_RATIO} from "./Constants";
+import {ADJUST_Z_DISTANCE, BIG_DEVICE_RATIO, defaultCameraOptions, SCREEN_DECREASE_RATIO} from "./defined/Constants";
 import Fences from "../components/Fences";
 import Lighting from "../components/Lighting";
 import {Font} from "three";
@@ -21,7 +21,6 @@ class SceneManager {
     private readonly orbitControls: OrbitControls;
     private animationSpeed = 0.005;
     private isViewingScene = true;
-    animationFrameID?: number;
     private prevTime = Date.now();
 
     scene: THREE.Scene;
@@ -30,11 +29,10 @@ class SceneManager {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        this.scene = this.buildScene();
+        this.scene = SceneManager.buildScene();
         this.renderer = this.buildRender();
         this.camera = this.buildCamera();
         this.orbitControls = this.buildOrbitControls();
-        this.animationFrameID = undefined;
 
         // Add Subjects to Scene
         this.scene.add(this.camera);
@@ -47,7 +45,7 @@ class SceneManager {
     /**
      * Build scene, the container for other 3D objects
      */
-    private buildScene(): THREE.Scene {
+    private static buildScene(): THREE.Scene {
         const scene = new THREE.Scene();
         scene.background = new THREE.Color("#323232");
         return scene;
@@ -73,7 +71,7 @@ class SceneManager {
         const nearPlane = defaultCameraOptions.nearPlane;
         const farPlane = defaultCameraOptions.farPlane;
         let zDistance = defaultCameraOptions.zDistance;
-        zDistance = this.zDistanceIncrease(zDistance);
+        zDistance = SceneManager.zDistanceIncrease(zDistance);
 
         const camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane);
 
@@ -93,7 +91,7 @@ class SceneManager {
      * Adjust the starting zDistance based on the screen ratio size at the start
      * @param zDistance
      */
-    private zDistanceIncrease(zDistance: number) {
+    private static zDistanceIncrease(zDistance: number) {
         let screenDecreaseRatio = 1 - (window.innerWidth * window.innerHeight) / (1536 * 754);
 
         if (window.devicePixelRatio < BIG_DEVICE_RATIO) { // bigger devices
@@ -185,13 +183,13 @@ class SceneManager {
      */
     animate(): void {
         // Render & Update subjects if necessary
-        this.animationFrameID =  requestAnimationFrame( this.animate ); // call back to get ID
+        requestAnimationFrame( this.animate ); // call back to get ID
         this.render();
     }
 
 
     /**
-     * Callback event that changes the camera view and the size of the renderering
+     * Callback event that changes the camera view and the size of the renderer
      * when the canvas changes
      */
     onWindowResize(): void {
@@ -219,12 +217,19 @@ class SceneManager {
         return this.horseManager;
     }
 
+    /**
+     * reset the perspective to the scene's origin
+     * also reset the orbit controls.
+     */
     resetCameraOrientation() {
         this.isViewingScene = true;
         this.orbitControls.reset();
     }
 
-    toggleIsViewingScene() {
+    /**
+     * toggle between perspectives
+     */
+    togglePerspective() {
         this.isViewingScene = !this.isViewingScene;
 
         if(this.isViewingScene)

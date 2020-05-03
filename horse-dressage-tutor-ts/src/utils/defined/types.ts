@@ -1,5 +1,10 @@
+/**
+ * Storage of interfaces and types
+ *
+ * @author: Ga Jun Young, 16440714
+ */
+
 import * as THREE from 'three';
-import HorseManager from "../components/HorseManager";
 
 export interface GridOptions {
     size: number,
@@ -99,12 +104,3 @@ export interface Point {
     y: number
 }
 
-export interface Label {
-    text: string,
-    progress: number,
-}
-
-export interface NavBarProps{
-    timeline: GSAPTimeline,
-    horseManager: HorseManager,
-}

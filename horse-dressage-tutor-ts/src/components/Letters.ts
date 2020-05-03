@@ -5,7 +5,7 @@
  */
 
 import * as THREE from 'three';
-import {CENTER_LETTERS, defaultLetterStyles, EDGE_LETTERS} from "../utils/Constants";
+import {CENTER_LETTERS, defaultLetterStyles, EDGE_LETTERS} from "../utils/defined/Constants";
 import {Font, Vector3} from "three";
 
 class Letters {

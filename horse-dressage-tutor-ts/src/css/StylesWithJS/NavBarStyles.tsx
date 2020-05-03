@@ -1,10 +1,11 @@
 /**
- * Style for the navigation bar (CSS-JS)
+ * Style for the navigation bar (CSS-IN-JS)
  *
- * @author: Ga Jun Young
+ * @author: Ga Jun Young, 16440714
  */
 
 import {createStyles, Theme} from "@material-ui/core";
+import {NAVBAR_HEIGHT} from "../../utils/defined/Constants";
 
 const drawerWidthAt600px = 240;
 const drawerWidthAt1000px = 300;
@@ -14,7 +15,7 @@ const appBarHeight = 60;
 const NavBarStyles = (theme: Theme) => createStyles({
         root: {
             flexGrow: 1,
-            height: '10vh',
+            height: NAVBAR_HEIGHT,
             position: 'relative',
         },
         appBar: {
@@ -98,7 +99,6 @@ const NavBarStyles = (theme: Theme) => createStyles({
         },
         paper: {
             position: 'absolute',
-            overflow: 'auto',
             height: '30vh',
             width: '99.5%',
             background: 'rgba(67, 67, 67, 0.3)',
@@ -167,6 +167,10 @@ const NavBarStyles = (theme: Theme) => createStyles({
             font: 'inherit',
             cursor: 'pointer',
             outline: 'inherit',
+
+            '&:active': {
+                background: 'rgba(255,255,255,0.3)',
+            }
         }
     });
 

@@ -1,70 +1,67 @@
 /**
- * The App container : displays loading when retrieving files then displays the container
+ * The App component : displays loading when retrieving files then displays the container
  *
  * @author: Ga Jun Young, 16440714
  */
 
 import React from 'react';
-import Loader from "./views/Loader";
+import LoadingPage from "./views/LoadingPage";
 import LoadManager from "./utils/LoadManager";
-import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
-import {Font} from "three";
-import {DressageTest} from "./utils/types";
 import {Container} from "./views/Container";
+import {DRESSAGE_SHEET_FILEPATHS} from "./utils/defined/Constants";
+import {AppState} from "./utils/defined/StateInterfaces";
 
-const DRESSAGE_SHEETS =["./sample/novice_dressage_110_2012.json",
-    "./sample/ipc_novice_dressage_championship_2017.json",
-    "./sample/airc_novice_dressage_22_2020.json"];
+export default class App extends React.PureComponent<{}, AppState> {
+    private loadManager: LoadManager;
 
-interface LoadState {
-    loading: boolean,
-    dressageSheets: DressageTest[],
-    horseGLTF: GLTF,
-    font: Font,
-}
+    constructor(props) {
+        super(props);
 
-export default class App extends React.PureComponent {
-    private loadManager = new LoadManager();
-    state: LoadState = {
-        loading: true,
-        dressageSheets: [],
-        horseGLTF: null,
-        font: null,
-    };
+        this.state = {
+            isPageLoading: true,
+            dressageJsonSheets: [],
+            horseFile: null,
+            fontFile: null,
+        };
+
+        this.loadManager = new LoadManager();
+    }
 
     /**
-     * When the component is set up, load files
+     * When the component is set up, load files and json sheets
      */
     componentDidMount(): void {
         // setup onLoad for loading manager
         this.loadManager.manager.onLoad = () => {
             this.setState({
-                horseGLTF: this.loadManager.horseGLTF,
-                font: this.loadManager.font
+                horseFile: this.loadManager.horseGLTF,
+                fontFile: this.loadManager.font
             });
 
-            this.fetchDressageSheet();
+            this.fetchJsonDressageSheets();
         };
 
-        // call methods to load specific objects
+        // call methods to load specific ThreeJS objects
         this.loadManager.loadHorse();
         this.loadManager.loadFont();
     }
 
     /**
-     * Fetches the dressage sheets
+     * Fetches the Json dressage sheets
      */
-    private fetchDressageSheet = () => {
-        for(let i = 0; i < DRESSAGE_SHEETS.length; i++) {
-            fetch(DRESSAGE_SHEETS[i])
+    private fetchJsonDressageSheets = () => {
+        for(let i = 0; i < DRESSAGE_SHEET_FILEPATHS.length; i++) { // iterate through all available dressage files...
+            fetch(DRESSAGE_SHEET_FILEPATHS[i])
                 .then(res => res.json())
                 .then(data => {
                     this.setState({
-                        dressageSheets: [...this.state.dressageSheets, data]
+                        dressageJsonSheets: [...this.state.dressageJsonSheets, data] // append new json data to the array
                     });
 
-                    if(i === DRESSAGE_SHEETS.length - 1) {
-                        this.setState({loading: false})
+                    if(i === DRESSAGE_SHEET_FILEPATHS.length - 1) {
+                        this.setState({
+                            isPageLoading: false
+                        });
                     }
                 })
                 .catch(error => {
@@ -77,11 +74,8 @@ export default class App extends React.PureComponent {
      * Render the components
      */
     render(): React.ReactElement| string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
-        if (this.state.loading) { return <Loader />; }
+        if (this.state.isPageLoading) { return <LoadingPage />; }
 
-        // loaded content as props for our container
-        const { dressageSheets, horseGLTF, font } = this.state;
-        console.log(dressageSheets);
-        return <Container dressageSheets={dressageSheets} horseGLTF={horseGLTF} font={font}/>
+        return <Container {...this.state}/>
     }
 }

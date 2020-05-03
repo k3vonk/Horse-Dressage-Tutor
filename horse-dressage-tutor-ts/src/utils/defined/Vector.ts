@@ -1,5 +1,7 @@
 /**
  * Vector class: enables additional methods for a Vector objects
+ *
+ * @author: Ga Jun Young, 16440714
  */
 import * as THREE from "three";
 

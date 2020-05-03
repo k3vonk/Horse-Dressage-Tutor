@@ -1,34 +1,26 @@
+/**
+ * The container component : displays the UI
+ *
+ * @author: Ga Jun Young, 16440714
+ */
+
 import React, {createRef} from "react";
-import {DressageTest} from "../utils/types";
-import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
-import {Font} from "three";
 import SceneManager from "../utils/SceneManager";
 import * as _ from 'underscore';
 import DressageTimeline from "../utils/DressageTimeline";
-import AnimationController from "./AnimationController";
-import HorseManager from "../components/HorseManager";
+import AnimationPlayer from "./AnimationPlayer";
 import NavBar from "./NavBar";
-
-interface ContainerProp {
-    dressageSheets: DressageTest[],
-    horseGLTF: GLTF,
-    font: Font,
-}
-
-interface ContainerState {
-    dressageTimeline: DressageTimeline,
-    currentSheet: DressageTest,
-    horseManager: HorseManager,
-    timelineProgress: number,
-    seconds: number,
-}
+import {ContainerProp} from "../utils/defined/PropInterfaces";
+import {ContainerState} from "../utils/defined/StateInterfaces";
 
 export class Container extends React.PureComponent<ContainerProp, ContainerState> {
 
     private mountRef = createRef<HTMLDivElement>();
     private canvasRef = createRef<HTMLCanvasElement>();
     private sceneManagerRef = createRef<SceneManager>();
-    resizeCanvasThrottled;
+
+    private readonly resizeCanvasThrottled: { (this: Window, ev: UIEvent): any; (this: Window, ev: UIEvent): any; };
+    private interval: NodeJS.Timeout;
 
     constructor(props: ContainerProp) {
         super(props);
@@ -36,16 +28,17 @@ export class Container extends React.PureComponent<ContainerProp, ContainerState
             dressageTimeline: null,
             horseManager: null,
             currentSheet: null,
-            timelineProgress: 0,
-            seconds: 0,
+            time: Date.now()
         };
 
         // bind methods to use 'this'
-        this.resizeCanvas = this.resizeCanvas.bind(this);
-        this.resetOrientation = this.resetOrientation.bind(this);
-        this.setNewDressageTest = this.setNewDressageTest.bind(this);
-        this.toggleView = this.toggleView.bind(this);
-        this.resizeCanvasThrottled = _.throttle(this.resizeCanvas, 500); //500ms per throttle
+        this.tick = this.tick.bind(this);
+        this.handleResizeCanvasCB = this.handleResizeCanvasCB.bind(this);
+        this.handleResetOrientationCB = this.handleResetOrientationCB.bind(this);
+        this.handleChangeDressageTestCB = this.handleChangeDressageTestCB.bind(this);
+        this.handleToggleViewCB = this.handleToggleViewCB.bind(this);
+
+        this.resizeCanvasThrottled = _.throttle(this.handleResizeCanvasCB, 500); //500ms per throttle
     }
 
     componentDidMount(): void {
@@ -54,16 +47,16 @@ export class Container extends React.PureComponent<ContainerProp, ContainerState
         mount.appendChild(sceneManagerInstance.renderer.domElement);
 
         // Add additional components to scene
-        sceneManagerInstance.addLetters(this.props.font);
-        const horseManager = sceneManagerInstance.addHorse(this.props.horseGLTF);
+        sceneManagerInstance.addLetters(this.props.fontFile);
+        const horseManager = sceneManagerInstance.addHorse(this.props.horseFile);
 
         // setup dressage timeline
-        const dressageTimeline = new DressageTimeline(horseManager, this.props.dressageSheets[0]);
+        const dressageTimeline = new DressageTimeline(horseManager, this.props.dressageJsonSheets[0]);
 
         // setup state
         this.setState({
             horseManager: horseManager,
-            currentSheet: this.props.dressageSheets[0],
+            currentSheet: this.props.dressageJsonSheets[0],
             dressageTimeline: dressageTimeline
         });
 
@@ -73,15 +66,30 @@ export class Container extends React.PureComponent<ContainerProp, ContainerState
         this.sceneManagerRef.current! = sceneManagerInstance;
 
         // resize canvas on init
-        this.resizeCanvas();
+        this.handleResizeCanvasCB();
         window.addEventListener("resize", this.resizeCanvasThrottled);
+
+        this.interval = setInterval(() => this.tick(), 500); // tick every 0.5 seconds
     }
 
     componentWillUnmount(): void {
         window.removeEventListener('resize', this.resizeCanvasThrottled);
+        clearInterval(this.interval);
     }
 
-    resizeCanvas() {
+    /**
+     * ticker to update the progress of the timeline
+     */
+    private tick() {
+        this.setState({ time: Date.now() });
+    };
+
+    // ============================ CALLBACK HANDLERS ======================================== //
+
+    /**
+     * Adjust the canvas to appropriate width and height of the screen
+     */
+    private handleResizeCanvasCB() {
          this.canvasRef.current.style.width = '100%';
          this.canvasRef.current.style.height= '100%';
 
@@ -91,30 +99,32 @@ export class Container extends React.PureComponent<ContainerProp, ContainerState
          this.sceneManagerRef.current.onWindowResize();
     };
 
-    resetOrientation() {
+    private handleResetOrientationCB() {
         this.sceneManagerRef.current.resetCameraOrientation();
+        this.setState({time: -1})
     };
 
-    toggleView() {
-        this.sceneManagerRef.current.toggleIsViewingScene();
+    private handleToggleViewCB() {
+        this.sceneManagerRef.current.togglePerspective();
     };
 
+    /**
+     * Clear old dressage timeline and assign new dressage timeline
+     * @param index
+     */
+    private handleChangeDressageTestCB(index: number) {
+        this.state.dressageTimeline.clear();
+        const dressageTimeline = new DressageTimeline(this.state.horseManager, this.props.dressageJsonSheets[index]);
 
-    setNewDressageTest(index: number) {
-        this.state.dressageTimeline.getTimeline().clear();
-        this.state.horseManager.resetHorsePosition();
-        const dressageTimeline = new DressageTimeline(this.state.horseManager, this.props.dressageSheets[index]);
-
+        // assign new dressageTimeline
         this.setState({
             dressageTimeline: dressageTimeline,
-            horseManager: this.state.horseManager,
-            currentSheet: this.props.dressageSheets[index],
-            timelineProgress: 0,
-            seconds: 0,
+            currentSheet: this.props.dressageJsonSheets[index],
+            time: 0
         });
+
         this.sceneManagerRef.current.resetCameraOrientation();
         dressageTimeline.getTimeline().play();
-
     }
 
     render() {
@@ -126,18 +136,20 @@ export class Container extends React.PureComponent<ContainerProp, ContainerState
 
            {this.state.dressageTimeline &&
                 <>
-                    <NavBar dressageSheets={this.props.dressageSheets}
-                            currentSheet={this.state.currentSheet.name}
+                    <NavBar dressageJsonSheets={this.props.dressageJsonSheets}
+                            currentSheetName={this.state.currentSheet.name}
                             timeline={this.state.dressageTimeline.getTimeline()}
+                            time={this.state.time}
                             horseManager={this.state.horseManager}
-                            changeDressageFunction={this.setNewDressageTest}
-                            handleResetView={this.resetOrientation}
+                            onChangeDressageSheet={this.handleChangeDressageTestCB}
+                            onResetView={this.handleResetOrientationCB}
                     />
 
-                    <AnimationController timeline={this.state.dressageTimeline.getTimeline()}
-                                         horseManager={this.state.horseManager}
-                                         title={this.state.currentSheet.name}
-                                         resetOrientation={this.toggleView}
+                    <AnimationPlayer horseManager={this.state.horseManager}
+                                     dressageTitle={this.state.currentSheet.name}
+                                     timeline={this.state.dressageTimeline.getTimeline()}
+                                     tick={this.state.time}
+                                     onToggleView={this.handleToggleViewCB}
                     />
                 </>
            }

@@ -1,175 +1,84 @@
 /**
- * Navigation Bar : draws the navigation app bar and the drawer of items
+ * Navigation Bar : draws the navigation app bar with two hamburgers and corresponding drawers.
  *
  * @author: Ga Jun Young, 16440714
  */
 import React from "react";
-import {
-    AppBar,
-    IconButton,
-    Toolbar,
-    Typography,
-    withStyles,
-    WithStyles,
-} from "@material-ui/core";
-import MenuIcon from '@material-ui/icons/Menu';
-import SettingsIcon from '@material-ui/icons/Settings';
-import NavBarStyles from "../css/MakeStyles/NavBarStyles";
+import {AppBar, withStyles,} from "@material-ui/core";
+import NavBarStyles from "../css/StylesWithJS/NavBarStyles";
 import clsx from 'clsx';
-import {DressageTest, Label} from "../utils/types";
-import HorseManager from "../components/HorseManager";
 import DrawerLeft from "./DrawerLeft";
 import DrawerRight from "./DrawerRight";
+import CustomToolbar from "./CustomToolbar";
+import {NavBarProps, NavBarStates} from "../utils/defined/StateInterfaces";
 
+class NavBar extends React.PureComponent<NavBarProps, NavBarStates> {
 
-interface NavBarProps extends WithStyles<typeof NavBarStyles>{
-    currentSheet: string,
-    dressageSheets: DressageTest[],
-    timeline: GSAPTimeline,
-    horseManager: HorseManager,
-    changeDressageFunction: (index:number) => void,
-    handleResetView: () =>void,
-}
-
-interface NavBarStates {
-    leftOpen: boolean,
-    rightOpen: boolean,
-    waitPeriod: number,
-    lastTimeScrolled: number,
-    progress: number,
-    title: string,
-    labels: Label[],
-}
-
-
-class NavBar extends React.Component<NavBarProps, NavBarStates> {
-
-    private interval;
     constructor(props: NavBarProps) {
         super(props);
 
         this.state = {
-            leftOpen: false,
-            rightOpen: false,
-            waitPeriod: 800,
-            lastTimeScrolled: Date.now(),
-            progress: 0,
-            title: props.timeline.currentLabel(),
-            labels: null,
+            isLeftOpen: false,
+            isRightOpen: false,
+            currTimestamp: 0,
+            title: props.timeline.currentLabel()
         };
 
         // bind functions for callback usage of 'this'
-        this.tick = this.tick.bind(this);
-        this.handleDrawerLeftOpen = this.handleDrawerLeftOpen.bind(this);
-        this.handleDrawerRightOpen = this.handleDrawerRightOpen.bind(this);
-        this.handleDrawerLeftClose = this.handleDrawerLeftClose.bind(this);
-        this.handleDrawerRightClose= this.handleDrawerRightClose.bind(this);
-        this.handleScroll = this.handleScroll.bind(this);
-        this.reloadNavBar = this.reloadNavBar.bind(this);
+        this.handleDrawerLeftOpenCB = this.handleDrawerLeftOpenCB.bind(this);
+        this.handleDrawerRightOpenCB = this.handleDrawerRightOpenCB.bind(this);
+        this.handleDrawerLeftCloseCB = this.handleDrawerLeftCloseCB.bind(this);
+        this.handleDrawerRightCloseCB= this.handleDrawerRightCloseCB.bind(this);
+        this.handleChangeDressageSheetCB = this.handleChangeDressageSheetCB.bind(this);
     }
 
-    componentDidMount(): void {
-        this.interval = setInterval(() => this.tick(), 1000);
-    }
+    componentDidUpdate(prevProps: Readonly<NavBarProps>, prevState: Readonly<NavBarStates>, snapshot?: any): void {
+        if(prevProps.time !== this.props.time) {
+            this.setState({
+                currTimestamp: this.props.timeline.progress() * this.props.timeline.totalDuration()
+            });
 
-    componentWillUnmount(): void {
-        clearInterval(this.interval);
-    }
-
-    reloadNavBar(index: number){
-        this.props.changeDressageFunction(index);
-        this.setState( {
-            leftOpen: false,
-            rightOpen: false,
-            waitPeriod: 800,
-            lastTimeScrolled: Date.now(),
-            progress: 0,
-            title: this.props.timeline.currentLabel(),
-            labels: null,
-        });
-    }
-    // ============== Callback functions
-    /**
-     * ticker to update a component
-     */
-    tick() {
-        this.setState({
-            progress: this.props.timeline.progress() * this.props.timeline.totalDuration()
-        });
-
-        if(this.state.title !== this.props.timeline.currentLabel()) {
-            this.setState({title: this.props.timeline.currentLabel()})
+            if(this.state.title !== this.props.timeline.currentLabel()) {
+                this.setState({title: this.props.timeline.currentLabel()})
+            }
         }
-    };
+    }
 
-    handleDrawerLeftOpen() {
+    // ==================   Callback functions   ==================
+    /**
+     * Given the index of the dressage sheet, change the dressage sheet and reset navbar state
+     * @param index
+     */
+    handleChangeDressageSheetCB(index: number){
+        this.props.onChangeDressageSheet(index);
+        this.setState( {
+            isLeftOpen: false,
+            isRightOpen: false,
+            currTimestamp: 0,
+            title: this.props.timeline.currentLabel()
+        });
+    }
+
+    handleDrawerLeftOpenCB() {
         this.setState({
-            leftOpen: true,
-            rightOpen: false,
+            isLeftOpen: true,
+            isRightOpen: false,
         })
     }
 
-    handleDrawerRightOpen() {
+    handleDrawerRightOpenCB() {
         this.setState({
-            leftOpen: false,
-            rightOpen: true
+            isLeftOpen: false,
+            isRightOpen: true
         })
     }
 
-    handleDrawerLeftClose() {
-        this.setState({leftOpen: false})
+    handleDrawerLeftCloseCB() {
+        this.setState({isLeftOpen: false})
     }
 
-    handleDrawerRightClose() {
-        this.setState({rightOpen: false})
-    }
-
-    /**
-     * Handles scrolls - when scrolling set the auto scroll to a waiting period
-     */
-    handleScroll() {
-        // last time user scrolled is 0.8s ago
-        if(this.state.lastTimeScrolled < new Date().getTime() - 800 ) { this.setState({waitPeriod: 800})
-        } else { this.setState({waitPeriod: 4000});} // else set a long wait
-        this.setState({lastTimeScrolled: Date.now()});
-    }
-
-
-    // =============== Drawable components
-    /**
-     * Draw the app bar's tools
-     */
-    drawToolbar() {
-        const {classes} = this.props;
-        return <Toolbar
-                className={classes.toolbar}
-        >
-            <IconButton
-                color={"inherit"}
-                aria-label="open drawer right"
-                edge={"start"}
-                onClick={this.handleDrawerLeftOpen}
-                className={clsx(classes.menuButton, this.state.leftOpen && classes.hide, this.state.rightOpen && classes.hideTitle)}
-            >
-                <MenuIcon/>
-            </IconButton>
-            <Typography
-                className={clsx(classes.title, (this.state.leftOpen || this.state.rightOpen) && classes.hideTitle)}
-                variant={"subtitle1"}
-                aria-label="current dressage step">
-                {this.state.title}
-            </Typography>
-
-            <IconButton
-                color={"inherit"}
-                aria-label="open drawer right"
-                edge={"end"}
-                onClick={this.handleDrawerRightOpen}
-                className={clsx(classes.menuButton, this.state.rightOpen && classes.hide, this.state.leftOpen && classes.hideTitle)}
-            >
-                <SettingsIcon/>
-            </IconButton>
-        </Toolbar>
+    handleDrawerRightCloseCB() {
+        this.setState({isRightOpen: false})
     }
 
     render() {
@@ -178,30 +87,33 @@ class NavBar extends React.Component<NavBarProps, NavBarStates> {
             <div  className={classes.root}>
                 <AppBar
                     className={clsx(classes.appBar, {
-                        [classes.appBarShift]: this.state.leftOpen,
-                        [classes.appBarShiftRight]: this.state.rightOpen,
+                        [classes.appBarShift]: this.state.isLeftOpen,
+                        [classes.appBarShiftRight]: this.state.isRightOpen,
                     })}
                 >
-                    {this.drawToolbar()}
+                    <CustomToolbar classes={classes} leftOpen={this.state.isLeftOpen}
+                                   rightOpen={this.state.isRightOpen} title={this.state.title}
+                                   onDrawerLeftOpen={this.handleDrawerLeftOpenCB}
+                                   onDrawerRightOpen={this.handleDrawerRightOpenCB}/>
                 </AppBar>
 
-                {this.state.leftOpen &&
-                <DrawerLeft progress={this.state.progress}
+                {this.state.isLeftOpen &&
+                <DrawerLeft currTimestamp={this.state.currTimestamp}
                             horseManager={this.props.horseManager}
                             timeline={this.props.timeline}
                             title={this.state.title}
-                            open={this.state.leftOpen}
-                            handleDrawerClose={this.handleDrawerLeftClose}
+                            open={this.state.isLeftOpen}
+                            onDrawerClose={this.handleDrawerLeftCloseCB}
                 />}
 
-                {this.state.rightOpen &&
+                {this.state.isRightOpen &&
                     <DrawerRight classes={classes}
-                                 open={this.state.rightOpen}
-                                 currentSheet={this.props.currentSheet}
-                                 dressageSheets={this.props.dressageSheets}
-                                 handleDrawerClose={this.handleDrawerRightClose}
-                                 changeDressageFunction={this.reloadNavBar}
-                                 handleResetView={this.props.handleResetView}
+                                 open={this.state.isRightOpen}
+                                 currentSheet={this.props.currentSheetName}
+                                 dressageSheets={this.props.dressageJsonSheets}
+                                 onDrawerClose={this.handleDrawerRightCloseCB}
+                                 onChangeDressageSheet={this.handleChangeDressageSheetCB}
+                                 onResetView={this.props.onResetView}
                     />
                 }
             </div>
