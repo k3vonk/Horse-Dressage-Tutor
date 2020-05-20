@@ -2,6 +2,7 @@
 
 A web application built in React with Typescript. 
 
+![Horse Dressage Tutor Demo](https://github.com/k3vonk/Horse-Dressage-Tutor/blob/master/Images/app_gif.gif)
 
 # Features
 * Animation Player to control the timeline animation of the horse.
