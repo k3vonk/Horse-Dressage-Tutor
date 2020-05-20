@@ -1,5 +1,5 @@
 # :horse: Horse Dressage Tutor
-A web application built in React with Typescript to help novice horse riders to learn a novice dressage test. Available at: https://novice-horse-dressage-app.ew.r.appspot.com/
+A web application built in React with Typescript to help novice horse riders to learn a novice dressage test. <br>Available at: https://novice-horse-dressage-app.ew.r.appspot.com/
 
 ![Horse Dressage Tutor Demo](https://github.com/k3vonk/Horse-Dressage-Tutor/blob/master/Images/app_gif.gif)
 
