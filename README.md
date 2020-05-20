@@ -1,6 +1,6 @@
 # :horse: Horse Dressage Tutor
 
-A web application built in React with Typescript. 
+A web application built in React with Typescript. Available at: https://novice-horse-dressage-app.ew.r.appspot.com/
 
 ![Horse Dressage Tutor Demo](https://github.com/k3vonk/Horse-Dressage-Tutor/blob/master/Images/app_gif.gif)
 
@@ -9,6 +9,31 @@ A web application built in React with Typescript.
 * Interactive scene with the ability to zoom, rotate, and pan.
 * A list of sub-tests related to a specific novice dressage test sheet.
 * 3 novice dressage test sheet to animate from.
+
+# JSON dressage test sheets
+Available Gait:
+* ```Walk```
+* ```Trot```
+* ```Canter-Left-Lead```
+* ```Canter-Right-Lead```
+
+
+Available Gait Types:
+| Type           | Walk  | Trot | Canter Left Lead | Canter Right Lead |
+|----------------|-------|------|------------------|-------------------|
+| ```Free ```          | X     |      |                  |                   |
+| ```Working  ```      |       | X    | X                | X                 |
+| ```Medium   ```      | X     |      |                  |                   |
+| ```Medium Strides``` |       | X    | X                | X                 |
+| ```Extended   ```    | X     |      |                  |                   |
+
+Available Actions:
+* ```Straight / Straight-End```: Travel in a straight line / straight line with an early stop. **(Req. 2-3 positions)**
+* ```Left / Left-Midpoint```: Turn left / Turn left and generate a midpoint to anchor the turning effect.**(Req. 2 positions)**
+* ```Right / Right-Midpoint```: Similar to left, but in a right movement.
+* ```Curvy-Straight```: A diagonal movement where the start and ends are curved. **(Req. 3 positions)**
+* ```Half-Circle-[Left/Right]-[10/15/20]```: Carry out a half circle action in the corresponding direction with a diameter N. **(Req. 2 positions)**
+* ```Exit```: Leave the arena exiting at A. **(Req. Position K/F, A, and Start)**
 
 # Local Install
 
