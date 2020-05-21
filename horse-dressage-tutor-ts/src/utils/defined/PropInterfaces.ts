@@ -18,6 +18,8 @@ export interface AnimationProps extends WithStyles<typeof AnimationPlayerStyles>
     horseManager: HorseManager,
     dressageTitle: string,
     tick: number,
+    dressageJsonSheets: DressageTest[],
+    onChangeDressageSheet: (index: number) => void,
     onToggleView: () => void
 }
 
@@ -65,5 +67,15 @@ export interface DrawerRightProps extends WithStyles<typeof NavBarStyles> {
     dressageSheets: DressageTest[],
     onChangeDressageSheet: (index: number) => void,
     onDrawerClose: () => void,
+    onResetView: () => void,
+}
+
+export interface NavBarProps extends WithStyles<typeof NavBarStyles> {
+    time: number,
+    currentSheetName: string,
+    dressageJsonSheets: DressageTest[],
+    horseManager: HorseManager,
+    timeline: GSAPTimeline,
+    onChangeDressageSheet: (index: number) => void,
     onResetView: () => void,
 }

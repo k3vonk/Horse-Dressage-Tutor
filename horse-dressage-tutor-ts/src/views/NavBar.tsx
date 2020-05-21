@@ -10,7 +10,8 @@ import clsx from 'clsx';
 import DrawerLeft from "./DrawerLeft";
 import DrawerRight from "./DrawerRight";
 import CustomToolbar from "./CustomToolbar";
-import {NavBarProps, NavBarStates} from "../utils/defined/StateInterfaces";
+import {NavBarStates} from "../utils/defined/StateInterfaces";
+import {NavBarProps} from "../utils/defined/PropInterfaces";
 
 class NavBar extends React.PureComponent<NavBarProps, NavBarStates> {
 

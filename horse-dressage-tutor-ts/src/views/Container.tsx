@@ -147,9 +147,11 @@ export class Container extends React.PureComponent<ContainerProp, ContainerState
 
                     <AnimationPlayer horseManager={this.state.horseManager}
                                      dressageTitle={this.state.currentSheet.name}
+                                     dressageJsonSheets={this.props.dressageJsonSheets}
                                      timeline={this.state.dressageTimeline.getTimeline()}
                                      tick={this.state.time}
                                      onToggleView={this.handleToggleViewCB}
+                                     onChangeDressageSheet={this.handleChangeDressageTestCB}
                     />
                 </>
            }

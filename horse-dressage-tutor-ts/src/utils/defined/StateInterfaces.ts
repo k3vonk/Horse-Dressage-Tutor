@@ -3,8 +3,7 @@
  *
  * @author: Ga Jun Young, 16440714
  */
-import {Mark, WithStyles} from "@material-ui/core";
-import NavBarStyles from "../../css/StylesWithJS/NavBarStyles";
+import {Mark} from "@material-ui/core";
 import HorseManager from "../../components/HorseManager";
 import DressageTimeline from "../DressageTimeline";
 import {GLTF} from "three/examples/jsm/loaders/GLTFLoader";
@@ -35,22 +34,13 @@ export interface AnimationState {
     totalTimestamp: string,
     currTimestamp: string,
     sliderValue: number,
+    anchor: HTMLElement,
     marks: Mark[],
 }
 
 export interface DrawerStates {
     lastTimeScrolled: number,
     waitPeriod: number,
-}
-
-export interface NavBarProps extends WithStyles<typeof NavBarStyles> {
-    time: number,
-    currentSheetName: string,
-    dressageJsonSheets: DressageTest[],
-    horseManager: HorseManager,
-    timeline: GSAPTimeline,
-    onChangeDressageSheet: (index: number) => void,
-    onResetView: () => void,
 }
 
 export interface NavBarStates {

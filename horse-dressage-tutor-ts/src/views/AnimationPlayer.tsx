@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import {withStyles} from "@material-ui/core";
+import {Button, MenuItem, Popper, withStyles} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import CustomSlider from "../css/StylesWithJS/CustomSlider";
 import AnimationPlayerStyles from "../css/StylesWithJS/AnimationPlayerStyles";
@@ -22,6 +22,7 @@ class AnimationPlayer extends React.PureComponent<AnimationProps, AnimationState
             isDraggablePaused: false,
             isReplayDisplayed: false,
             isToggled: false,
+            anchor: null,
             totalTimestamp: '00:00',
             currTimestamp: '00:00',
             sliderValue: 0,
@@ -33,6 +34,8 @@ class AnimationPlayer extends React.PureComponent<AnimationProps, AnimationState
         this.handleSliderChangeCB = this.handleSliderChangeCB.bind(this);
         this.handleSliderCommittedCB = this.handleSliderCommittedCB.bind(this);
         this.handleHorseButtonToggleCB = this.handleHorseButtonToggleCB.bind(this);
+        this.handleDressageTitleOnClickCB = this.handleDressageTitleOnClickCB.bind(this);
+        this.handleDressageTitleCloseCB = this.handleDressageTitleCloseCB.bind(this);
     }
 
     componentDidMount(): void {
@@ -168,6 +171,18 @@ class AnimationPlayer extends React.PureComponent<AnimationProps, AnimationState
         this.setState({isToggled: !this.state.isToggled})
     };
 
+    private handleDressageTitleOnClickCB(event: React.MouseEvent<HTMLButtonElement>) {
+        if (this.state.anchor === null) {
+            this.setState({anchor: event.currentTarget});
+        } else {
+            this.setState({anchor: null})
+        }
+    };
+
+    private handleDressageTitleCloseCB() {
+        this.setState({anchor: null})
+    };
+
     render() {
         const {classes} = this.props;
 
@@ -204,9 +219,40 @@ class AnimationPlayer extends React.PureComponent<AnimationProps, AnimationState
                     </Grid>
 
                     <Grid item xs={6}>
-                        <p className={classes.dressageName}>{this.props.dressageTitle}</p>
+                        <Grid container justify='flex-end' alignItems="center">
+                            <Grid item>
+                                <Button className={classes.titleBtn} aria-controls={'dressage-menu'} aria-haspopup={'true'} onClick={this.handleDressageTitleOnClickCB}>
+                                    {this.props.dressageTitle}
+                                </Button>
+
+
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
+
+                {Boolean(this.state.anchor) &&
+                    <Popper
+                        id={'dressage-menu'}
+                        anchorEl={this.state.anchor}
+                        keepMounted
+                        open={Boolean(this.state.anchor)}
+                        className={classes.menu}
+                    >
+
+                        {this.props.dressageJsonSheets.map((test, index) => (
+                            <div key={index}>
+                                <MenuItem className={classes.menuItem} onClick={() => {
+                                    this.props.onChangeDressageSheet(index);
+                                    this.handleDressageTitleCloseCB()
+                                }
+                                }>{test.name}</MenuItem>
+                            </div>
+                        ))}
+
+
+                    </Popper>
+                }
             </div>
         )
     }
