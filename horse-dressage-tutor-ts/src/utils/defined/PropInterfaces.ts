@@ -9,6 +9,7 @@ import HorseManager from "../../components/HorseManager";
 import AnimationPlayerStyles from "../../css/StylesWithJS/AnimationPlayerStyles";
 import {DressageTest} from "./types";
 import {FileState} from "./StateInterfaces";
+import SceneManager from "../SceneManager";
 
 export interface ContainerProp extends FileState {
 }
@@ -16,7 +17,7 @@ export interface ContainerProp extends FileState {
 export interface AnimationProps extends WithStyles<typeof AnimationPlayerStyles> {
     timeline: GSAPTimeline,
     horseManager: HorseManager,
-    dressageTitle: string,
+    currentSheetName: string,
     tick: number,
     dressageJsonSheets: DressageTest[],
     onChangeDressageSheet: (index: number) => void,
@@ -64,6 +65,8 @@ export interface ListItemProps {
 export interface DrawerRightProps extends WithStyles<typeof NavBarStyles> {
     open: boolean,
     currentSheet: string,
+    sceneManager: SceneManager,
+    timeline: GSAPTimeline,
     dressageSheets: DressageTest[],
     onChangeDressageSheet: (index: number) => void,
     onDrawerClose: () => void,
@@ -71,10 +74,11 @@ export interface DrawerRightProps extends WithStyles<typeof NavBarStyles> {
 }
 
 export interface NavBarProps extends WithStyles<typeof NavBarStyles> {
-    time: number,
+    tick: number,
     currentSheetName: string,
     dressageJsonSheets: DressageTest[],
     horseManager: HorseManager,
+    sceneManager: SceneManager,
     timeline: GSAPTimeline,
     onChangeDressageSheet: (index: number) => void,
     onResetView: () => void,

@@ -235,6 +235,14 @@ class SceneManager {
         if(this.isViewingScene)
             this.resetCameraOrientation();
     }
+
+    getAnimationSpeed() {
+        return this.animationSpeed;
+    }
+
+    setAnimationSpeed(animationSpeed: number) {
+        this.animationSpeed = animationSpeed;
+    }
     
 }
 

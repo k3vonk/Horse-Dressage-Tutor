@@ -139,20 +139,22 @@ export class Container extends React.PureComponent<ContainerProp, ContainerState
                     <NavBar dressageJsonSheets={this.props.dressageJsonSheets}
                             currentSheetName={this.state.currentSheet.name}
                             timeline={this.state.dressageTimeline.getTimeline()}
-                            time={this.state.time}
+                            tick={this.state.time}
                             horseManager={this.state.horseManager}
+                            sceneManager={this.sceneManagerRef.current}
                             onChangeDressageSheet={this.handleChangeDressageTestCB}
                             onResetView={this.handleResetOrientationCB}
                     />
 
-                    <AnimationPlayer horseManager={this.state.horseManager}
-                                     dressageTitle={this.state.currentSheet.name}
+                    <AnimationPlayer currentSheetName={this.state.currentSheet.name}
                                      dressageJsonSheets={this.props.dressageJsonSheets}
                                      timeline={this.state.dressageTimeline.getTimeline()}
                                      tick={this.state.time}
+                                     horseManager={this.state.horseManager}
                                      onToggleView={this.handleToggleViewCB}
                                      onChangeDressageSheet={this.handleChangeDressageTestCB}
                     />
+
                 </>
            }
         </React.Fragment>

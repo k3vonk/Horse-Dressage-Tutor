@@ -222,7 +222,7 @@ class AnimationPlayer extends React.PureComponent<AnimationProps, AnimationState
                         <Grid container justify='flex-end' alignItems="center">
                             <Grid item>
                                 <Button className={classes.titleBtn} aria-controls={'dressage-menu'} aria-haspopup={'true'} onClick={this.handleDressageTitleOnClickCB}>
-                                    {this.props.dressageTitle}
+                                    {this.props.currentSheetName}
                                 </Button>
 
 

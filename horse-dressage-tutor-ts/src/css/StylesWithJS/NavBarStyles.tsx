@@ -125,10 +125,6 @@ const NavBarStyles = (theme: Theme) => createStyles({
             '@media (min-width: 500px)': {
                height: appBarHeight
             },
-            '@media (min-width: 1000px)': {
-                //position:"fixed",
-               // width: drawerWidthAt1000px,
-            },
         },
         backButton: {
             width: '100%',
@@ -171,6 +167,14 @@ const NavBarStyles = (theme: Theme) => createStyles({
             '&:active': {
                 background: 'rgba(255,255,255,0.3)',
             }
+        },
+        animationSlider: {
+            '@media (min-width: 300px)': {
+                width: '90%'
+            },
+            '@media (min-width: 500px)': {
+                width: '80%'
+            },
         }
     });
 

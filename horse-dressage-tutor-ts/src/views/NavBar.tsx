@@ -34,7 +34,7 @@ class NavBar extends React.PureComponent<NavBarProps, NavBarStates> {
     }
 
     componentDidUpdate(prevProps: Readonly<NavBarProps>, prevState: Readonly<NavBarStates>, snapshot?: any): void {
-        if(prevProps.time !== this.props.time) {
+        if(prevProps.tick !== this.props.tick) {
             this.setState({
                 currTimestamp: this.props.timeline.progress() * this.props.timeline.totalDuration()
             });
@@ -112,6 +112,8 @@ class NavBar extends React.PureComponent<NavBarProps, NavBarStates> {
                                  open={this.state.isRightOpen}
                                  currentSheet={this.props.currentSheetName}
                                  dressageSheets={this.props.dressageJsonSheets}
+                                 timeline={this.props.timeline}
+                                 sceneManager={this.props.sceneManager}
                                  onDrawerClose={this.handleDrawerRightCloseCB}
                                  onChangeDressageSheet={this.handleChangeDressageSheetCB}
                                  onResetView={this.props.onResetView}
