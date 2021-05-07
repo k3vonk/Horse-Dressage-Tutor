@@ -19,7 +19,7 @@
     "react-scripts": "3.4.1",
     "three": "^0.115.0",
     "typescript": "~3.7.2",
-    "underscore": "^1.10.2"
+    "underscore": "^1.12.1"
   },
   "scripts": {
     "start": "react-scripts start",
